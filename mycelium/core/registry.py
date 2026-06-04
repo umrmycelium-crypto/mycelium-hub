@@ -1,5 +1,6 @@
 from .event_bus import EventBus
 from .. import actions
+from ..subscribers.logger import handle_log
 
 def register_all():
     """
@@ -14,5 +15,8 @@ def register_all():
     bus.subscribe("knowledge.search", actions.handle_knowledge_search)
     bus.subscribe("developer.assist", actions.handle_dev_assist)
     bus.subscribe("unknown", actions.handle_unknown)
+
+    # Global Observability
+    bus.subscribe("*", handle_log)
 
     return bus
