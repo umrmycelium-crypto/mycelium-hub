@@ -1,0 +1,7 @@
+venv/
+venv312/
+*.wav
+__pycache__/
+.DS_Store
+*.pyc
+tool-outputs/
