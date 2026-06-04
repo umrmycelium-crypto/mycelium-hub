@@ -1,0 +1,23 @@
+media.play:
+  - play
+  - watch
+  - stream
+
+media.search:
+  - find
+  - search
+
+system.status:
+  - status
+  - health
+  - check
+
+knowledge.search:
+  - note
+  - knowledge
+  - obsidian
+
+developer.assist:
+  - code
+  - program
+  - build
