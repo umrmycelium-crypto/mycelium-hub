@@ -1,9 +1,13 @@
 from .router import detect_intent
-from .actions import execute
+from .core.registry import register_all
 import json
 
 def main():
-    print("Mycelium Intent Engine v0.3 (Normalized Output Mode - Type 'exit' to quit)")
+    print("Mycelium Intent Engine v0.4 (Event Bus Mode - Type 'exit' to quit)")
+    
+    # Initialize Registry and Bus
+    bus = register_all()
+    
     while True:
         try:
             command = input("> ")
@@ -11,16 +15,26 @@ def main():
                 break
                 
             intent = detect_intent(command)
-            result = execute(intent, command)
+            
+            # Publish event to the bus
+            # Note: bus.publish returns a list of results from all subscribers
+            results = bus.publish(intent, {"text": command})
+            
+            if not results:
+                print(f"[UNKNOWN] No subscribers for intent: {intent}")
+                continue
+
+            # For v0.4, we primarily handle the first result (main action)
+            result = results[0]
             
             # Print user-friendly message
             print(f"[{result['status'].upper()}] {result['message']}")
             
-            # Optionally print full data if significant
+            # Special handling for developer analysis
             if result['intent'] == 'developer.assist' and result['status'] == 'ok':
                  print("\nAnalysis Output:")
                  print(result['data'].get('analysis'))
-            elif result['data'] and result['intent'] != 'media.play':
+            elif result['data'] and result['intent'] not in ['media.play', 'media.search']:
                 print(f"Data: {result['data']}")
             
         except EOFError:
