@@ -4,10 +4,14 @@ from .knowledge import search_notes
 from .core.response import make_response
 
 def handle_media_play(payload):
-    text = payload.get("text", "")
     intent = "media.play"
-    title = text.lower().replace("play", "").replace("watch", "").replace("start", "").strip()
+    # Prioritize extracted title from LLM entities
+    title = payload.get("title")
+    if not title:
+        text = payload.get("text", "")
+        title = text.lower().replace("play", "").replace("watch", "").replace("start", "").strip()
     
+    print(f"[MEDIA] Searching Jellyfin for: '{title}'")
     results = search_media(title)
     if "error" in results:
         return make_response(intent, "error", message=f"Error searching media: {results['error']}")
@@ -41,12 +45,16 @@ def handle_media_play(payload):
     )
 
 def handle_media_search(payload):
-    text = payload.get("text", "")
-    query = text.lower().replace("search", "").replace("find", "").strip()
+    intent = "media.search"
+    query = payload.get("query")
+    if not query:
+        text = payload.get("text", "")
+        query = text.lower().replace("search", "").replace("find", "").strip()
+    
     results = search_media(query)
     items = results.get("Items", [])
     return make_response(
-        intent="media.search",
+        intent=intent,
         data={"count": len(items), "results": items},
         message=f"Found {len(items)} match(es) for '{query}'"
     )
@@ -68,21 +76,24 @@ def handle_system_status(payload):
     )
 
 def handle_knowledge_search(payload):
-    text = payload.get("text", "")
-    query = text.lower()
-    stop_phrases = ["what did i write about", "what did i say about", "search for", "find in vault", "note down", "remember"]
-    for phrase in stop_phrases:
-        query = query.replace(phrase, "")
-    for kw in ["note", "search", "remember", "find", "about", "vault", "thought"]:
-        query = query.replace(kw, "")
-    query = query.strip()
+    intent = "knowledge.search"
+    query = payload.get("query")
+    if not query:
+        text = payload.get("text", "")
+        stop_phrases = ["what did i write about", "what did i say about", "search for", "find in vault", "note down", "remember"]
+        for phrase in stop_phrases:
+            text = text.replace(phrase, "")
+        for kw in ["note", "search", "remember", "find", "about", "vault", "thought"]:
+            text = text.replace(kw, "")
+        query = text.strip()
     
+    print(f"[KNOWLEDGE] Searching vault for: '{query}'")
     results = search_notes(query)
     if isinstance(results, dict) and "error" in results:
-        return make_response("knowledge.search", "error", message=f"Knowledge search error: {results['error']}")
+        return make_response(intent, "error", message=f"Knowledge search error: {results['error']}")
     
     return make_response(
-        intent="knowledge.search",
+        intent=intent,
         data={"matches": results},
         message=f"Found {len(results)} matching note(s) for '{query}'"
     )
