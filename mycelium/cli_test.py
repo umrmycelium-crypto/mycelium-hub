@@ -14,21 +14,32 @@ def main():
             if command.lower() in ["exit", "quit"]:
                 break
                 
-            intent = detect_intent(command)
+            # detect_intent now returns a dict with 'intent', 'confidence', 'entities'
+            intent_data = detect_intent(command)
+            intent = intent_data["intent"]
+            
+            # Use extracted entities as the primary payload, fallback to raw text if needed
+            payload = intent_data["entities"]
+            if "text" not in payload:
+                payload["text"] = command
             
             # Publish event to the bus
-            # Note: bus.publish returns a list of results from all subscribers
-            results = bus.publish(intent, {"text": command})
+            results = bus.publish(intent, payload)
             
+            # Debug info
+            print(f"DEBUG: Detected Intent: {intent} (Confidence: {intent_data['confidence']:.2f})")
+            if intent_data['entities']:
+                print(f"DEBUG: Entities: {intent_data['entities']}")
+
             if not results:
-                print(f"[UNKNOWN] No subscribers for intent: {intent}")
+                print(f"[UNKNOWN] No subscribers for intent: {intent} (Confidence: {intent_data['confidence']:.2f})")
                 continue
 
             # For v0.4, we primarily handle the first result (main action)
             result = results[0]
             
             # Print user-friendly message
-            print(f"[{result['status'].upper()}] {result['message']}")
+            print(f"[{result['status'].upper()}] {result['message']} (Intent: {intent}, Confidence: {intent_data['confidence']:.2f})")
             
             # Special handling for developer analysis
             if result['intent'] == 'developer.assist' and result['status'] == 'ok':

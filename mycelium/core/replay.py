@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from .diff import diff_events
 
 # Use the same log file path established in the logger module
 LOG_FILE = Path("mycelium/logs/event_log.jsonl")
@@ -26,6 +27,7 @@ def load_events():
 def replay(bus, filter_event=None):
     """
     Re-publishes logged events to the bus and collects the results.
+    Compares replayed results with original recorded results.
     """
     events = load_events()
     replay_trace = []
@@ -37,15 +39,19 @@ def replay(bus, filter_event=None):
             continue
             
         payload = event.get("payload", {})
+        original_results = event.get("results", [])
         
         # Publish back to the bus to trigger current handlers
-        results = bus.publish(event_type, payload)
+        replayed_results = bus.publish(event_type, payload)
+        
+        # Compare behavior
+        comparison = diff_events(original_results, replayed_results)
         
         replay_trace.append({
             "original_timestamp": event.get("timestamp"),
             "event": event_type,
             "payload": payload,
-            "replayed_results": results
+            "diff": comparison
         })
 
     return replay_trace
