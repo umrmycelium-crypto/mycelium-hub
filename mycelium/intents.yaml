@@ -17,9 +17,13 @@ system.status:
 
 knowledge.search:
   - note
-  - knowledge
-  - obsidian
+  - remember
+  - search notes
+  - what did i say
+  - find in vault
   - thought
+  - write about
+  - vault
 
 developer.assist:
   - code

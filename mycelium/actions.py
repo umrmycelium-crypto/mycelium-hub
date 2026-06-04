@@ -1,5 +1,6 @@
 from .jellyfin import search_media, get_sessions, play_media
 from .gemini_executor import run_gemini_command
+from .knowledge import search_notes
 
 def execute(intent, text):
     if intent == "media.play":
@@ -54,7 +55,29 @@ def execute(intent, text):
         print("[SYSTEM] Action: Retrieving system health and service status.")
 
     elif intent == "knowledge.search":
-        print(f"[KNOWLEDGE] Action: Searching Obsidian vault for: '{text}'")
+        # More aggressive query extraction for v0
+        query = text.lower()
+        stop_phrases = ["what did i write about", "what did i say about", "search for", "find in vault", "note down", "remember"]
+        for phrase in stop_phrases:
+            query = query.replace(phrase, "")
+        
+        # Also remove individual keywords
+        for kw in ["note", "search", "remember", "find", "about", "vault", "thought"]:
+            query = query.replace(kw, "")
+            
+        query = query.strip()
+        print(f"[KNOWLEDGE] Searching vault for: '{query}'")
+        
+        results = search_notes(query)
+        
+        if isinstance(results, dict) and "error" in results:
+            print(f"[KNOWLEDGE] Error: {results['error']}")
+        elif not results:
+            print(f"[KNOWLEDGE] No notes found matching: '{query}'")
+        else:
+            print(f"[KNOWLEDGE] Found {len(results)} matching note(s):")
+            for rel_path in results:
+                print(f" - {rel_path}")
 
     else:
         print(f"[UNKNOWN] No action mapped for intent: {intent}")
