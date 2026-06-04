@@ -1,83 +1,92 @@
 from .jellyfin import search_media, get_sessions, play_media
 from .gemini_executor import run_gemini_command
 from .knowledge import search_notes
+from .core.response import make_response
 
 def execute(intent, text):
     if intent == "media.play":
         title = text.lower().replace("play", "").replace("watch", "").replace("start", "").strip()
-        print(f"[MEDIA] Searching Jellyfin for: '{title}'")
-
         results = search_media(title)
-
+        
         if "error" in results:
-            print(f"[MEDIA] Error searching media: {results['error']}")
-            return
-
+            return make_response(intent, "error", message=f"Error searching media: {results['error']}")
+            
         if not results.get("Items"):
-            print(f"[MEDIA] No matches found in library for: '{title}'")
-            return
+            return make_response(intent, "not_found", message=f"No matches found in library for: '{title}'")
 
         item = results["Items"][0]
         item_id = item["Id"]
-        print(f"[MEDIA] Selected: {item.get('Name')} ({item.get('Type')})")
 
         sessions = get_sessions()
         if "error" in sessions:
-            print(f"[MEDIA] Error retrieving sessions: {sessions['error']}")
-            return
+            return make_response(intent, "error", message=f"Error retrieving sessions: {sessions['error']}")
 
         tv_session_id = None
+        target_device = "Unknown"
         for s in sessions:
             if "Samsung" in s.get("DeviceName", ""):
                 tv_session_id = s["Id"]
-                print(f"[MEDIA] Target device found: {s.get('DeviceName')}")
+                target_device = s.get("DeviceName")
                 break
-
+        
         if not tv_session_id:
-            print("[MEDIA] No active Samsung TV session found. Check if the app is open.")
-            return
+            return make_response(intent, "device_offline", message="No active Samsung TV session found. Check if the app is open.")
 
-        status = play_media(tv_session_id, item_id)
-        print(f"[MEDIA] Playback response status: {status}")
-
+        status_code = play_media(tv_session_id, item_id)
+        
+        return make_response(
+            intent=intent,
+            status="success" if status_code == 204 else "failed",
+            data={"title": item.get('Name'), "id": item_id, "device": target_device},
+            message=f"Playing {item.get('Name')} on {target_device}",
+            debug={"status_code": status_code}
+        )
+            
     elif intent == "media.search":
-        print(f"[MEDIA] Action: Searching for: '{text}'")
+        query = text.lower().replace("search", "").replace("find", "").strip()
+        results = search_media(query)
+        items = results.get("Items", [])
+        return make_response(
+            intent=intent,
+            data={"count": len(items), "results": items},
+            message=f"Found {len(items)} match(es) for '{query}'"
+        )
 
     elif intent == "developer.assist":
-        print(f"[DEV] Analyzing request with Gemini CLI...")
         prompt = f"Analyze the following Mycelium Ecosystem request and provide a brief technical assessment: '{text}'"
         response = run_gemini_command(prompt)
-        print("-" * 20)
-        print(response)
-        print("-" * 20)
+        return make_response(
+            intent=intent,
+            data={"analysis": response},
+            message="Technical assessment complete."
+        )
 
     elif intent == "system.status":
-        print("[SYSTEM] Action: Retrieving system health and service status.")
+        # Placeholder for v0
+        return make_response(
+            intent=intent,
+            message="System is operational. Services: Jellyfin, Ollama, Gemini CLI."
+        )
 
     elif intent == "knowledge.search":
-        # More aggressive query extraction for v0
         query = text.lower()
         stop_phrases = ["what did i write about", "what did i say about", "search for", "find in vault", "note down", "remember"]
         for phrase in stop_phrases:
             query = query.replace(phrase, "")
-        
-        # Also remove individual keywords
         for kw in ["note", "search", "remember", "find", "about", "vault", "thought"]:
             query = query.replace(kw, "")
-            
         query = query.strip()
-        print(f"[KNOWLEDGE] Searching vault for: '{query}'")
         
         results = search_notes(query)
         
         if isinstance(results, dict) and "error" in results:
-            print(f"[KNOWLEDGE] Error: {results['error']}")
-        elif not results:
-            print(f"[KNOWLEDGE] No notes found matching: '{query}'")
-        else:
-            print(f"[KNOWLEDGE] Found {len(results)} matching note(s):")
-            for rel_path in results:
-                print(f" - {rel_path}")
+            return make_response(intent, "error", message=f"Knowledge search error: {results['error']}")
+        
+        return make_response(
+            intent=intent,
+            data={"matches": results},
+            message=f"Found {len(results)} matching note(s) for '{query}'"
+        )
 
     else:
-        print(f"[UNKNOWN] No action mapped for intent: {intent}")
+        return make_response(intent, "unknown", message=f"No action mapped for intent: {intent}")

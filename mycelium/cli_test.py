@@ -1,8 +1,9 @@
 from .router import detect_intent
 from .actions import execute
+import json
 
 def main():
-    print("Mycelium Intent Engine v0.2 (CLI Test Mode - Type 'exit' to quit)")
+    print("Mycelium Intent Engine v0.3 (Normalized Output Mode - Type 'exit' to quit)")
     while True:
         try:
             command = input("> ")
@@ -10,8 +11,17 @@ def main():
                 break
                 
             intent = detect_intent(command)
-            print(f"Intent: {intent}")
-            execute(intent, command)
+            result = execute(intent, command)
+            
+            # Print user-friendly message
+            print(f"[{result['status'].upper()}] {result['message']}")
+            
+            # Optionally print full data if significant
+            if result['intent'] == 'developer.assist' and result['status'] == 'ok':
+                 print("\nAnalysis Output:")
+                 print(result['data'].get('analysis'))
+            elif result['data'] and result['intent'] != 'media.play':
+                print(f"Data: {result['data']}")
             
         except EOFError:
             break

@@ -39,7 +39,8 @@ def listen_and_route():
     intent = detect_intent(text)
     print(f"INTENT: {intent}")
     
-    execute(intent, text)
+    result = execute(intent, text)
+    print(f"[{result['status'].upper()}] {result['message']}")
 
 if __name__ == "__main__":
     listen_and_route()
