@@ -3,6 +3,8 @@ from .jellyseerr import search_media as search_jellyseerr, request_media
 from .gemini_executor import run_gemini_command
 from .knowledge import search_notes
 from .core.response import make_response
+from . import radarr
+from . import sonarr
 
 def handle_media_play(payload):
     intent = "media.play"
@@ -78,6 +80,57 @@ def handle_media_request(payload):
         message=f"Request submitted for '{match_title}'. It will be available for playback soon."
     )
 
+def handle_media_status(payload):
+    intent = "media.status"
+    
+    print("[MEDIA] Checking download queues...")
+    radarr_queue = radarr.get_queue()
+    sonarr_queue = sonarr.get_queue()
+    
+    items = []
+    
+    # Process Radarr (Movies)
+    if not isinstance(radarr_queue, dict) or "error" not in radarr_queue:
+        records = radarr_queue.get("records", []) if isinstance(radarr_queue, dict) else []
+        for r in records:
+            items.append({
+                "title": r.get("title"),
+                "status": r.get("status"),
+                "size": r.get("size"),
+                "remaining": r.get("sizeleft"),
+                "eta": r.get("estimatedCompletionTime")
+            })
+            
+    # Process Sonarr (Series)
+    if not isinstance(sonarr_queue, dict) or "error" not in sonarr_queue:
+        records = sonarr_queue.get("records", []) if isinstance(sonarr_queue, dict) else []
+        for r in records:
+            items.append({
+                "title": r.get("title"),
+                "status": r.get("status"),
+                "size": r.get("size"),
+                "remaining": r.get("sizeleft"),
+                "eta": r.get("estimatedCompletionTime")
+            })
+
+    if not items:
+        return make_response(intent, "ok", message="Download queue is empty.")
+    
+    # Generate human readable summary
+    msg = f"Found {len(items)} item(s) in queue:\n"
+    for item in items:
+        msg += f"- {item['title']}: {item['status']} ({item['remaining']}/{item['size']} left)"
+        if item['eta']:
+            msg += f" - ETA: {item['eta']}"
+        msg += "\n"
+        
+    return make_response(
+        intent=intent,
+        status="ok",
+        data={"queue": items},
+        message=msg
+    )
+
 def handle_media_search(payload):
     intent = "media.search"
     query = payload.get("query")
@@ -106,7 +159,7 @@ def handle_dev_assist(payload):
 def handle_system_status(payload):
     return make_response(
         intent="system.status",
-        message="System is operational. Services: Jellyfin, Ollama, Gemini CLI, Jellyseerr."
+        message="System is operational. Services: Jellyfin, Ollama, Gemini CLI, Jellyseerr, Radarr, Sonarr."
     )
 
 def handle_knowledge_search(payload):

@@ -9,6 +9,7 @@ Your job is to convert a single user input into a JSON list of independent, orde
 Valid intents:
 - media.play: Watch or play a specific movie/show.
 - media.search: Find or look up media.
+- media.status: Check download progress, queue, or acquisition state.
 - system.status: Check health or status of the system/services.
 - knowledge.search: Search notes, vault, or knowledge base.
 - developer.assist: Technical analysis or codebase help.
@@ -19,7 +20,8 @@ Return ONLY a valid JSON list in this format:
     "intent": "intent.name",
     "entities": {
       "title": "extracted title",
-      "query": "extracted query"
+      "query": "extracted query",
+      "type": "movie | series"
     }
   }
 ]

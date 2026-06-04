@@ -1,15 +1,42 @@
 {
   "aliases": {},
   "failed_intents": {
-    "play midsommar": 2,
+    "play midsommar": 7,
     "search notes for jellyfin": 1
   },
-  "media.play": {},
+  "media.play": {
+    "midsommar": {
+      "success_count": 1,
+      "failure_count": 0,
+      "last_used": "2026-06-04T20:30:35.244601+00:00"
+    }
+  },
   "knowledge.search": {
     "jellyfin": {
       "success_count": 1,
       "failure_count": 0,
       "last_used": "2026-06-04T19:44:32.923488+00:00"
+    }
+  },
+  "system.status": {
+    "midsommar": {
+      "success_count": 1,
+      "failure_count": 0,
+      "last_used": "2026-06-04T20:33:35.765321+00:00"
+    }
+  },
+  "media.search": {
+    "jellyfin": {
+      "success_count": 1,
+      "failure_count": 0,
+      "last_used": "2026-06-04T20:33:35.768219+00:00"
+    }
+  },
+  "media.status": {
+    "midsommar": {
+      "success_count": 1,
+      "failure_count": 0,
+      "last_used": "2026-06-04T20:56:04.670190+00:00"
     }
   }
 }

@@ -8,6 +8,14 @@ media.search:
   - find
   - search
 
+media.status:
+  - download status
+  - queue
+  - acquisition
+  - how is the movie
+  - progress
+  - eta
+
 system.status:
   - status
   - health

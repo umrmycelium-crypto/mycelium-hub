@@ -47,3 +47,20 @@ def request_media(tmdb_id, media_type="movie"):
         return r.json()
     except Exception as e:
         return {"error": str(e)}
+
+def get_requests():
+    """
+    Retrieves the list of active requests from Jellyseerr.
+    """
+    if not API_KEY:
+        return {"error": "Jellyseerr API Key not configured"}
+
+    url = f"{SERVER}/request"
+    params = {"take": 10, "skip": 0, "filter": "all"}
+    
+    try:
+        r = requests.get(url, headers=HEADERS, params=params, timeout=10)
+        r.raise_for_status()
+        return r.json()
+    except Exception as e:
+        return {"error": str(e)}
