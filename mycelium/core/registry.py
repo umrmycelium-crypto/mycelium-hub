@@ -14,6 +14,7 @@ def register_all():
     bus.subscribe("system.status", actions.handle_system_status)
     bus.subscribe("knowledge.search", actions.handle_knowledge_search)
     bus.subscribe("developer.assist", actions.handle_dev_assist)
+    bus.subscribe("media.request_download", actions.handle_media_request)
     bus.subscribe("unknown", actions.handle_unknown)
 
     # Global Observability

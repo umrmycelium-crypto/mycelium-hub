@@ -17,9 +17,9 @@ Sonarr:
 Status: Running
 Port: 8989
 
-Overseerr:
+Jellyseerr:
 Status: Running
-Port: 5055
+Port: 5055 (Replaced Overseerr for Jellyfin support)
 
 qbittorrent:
 Status: Running

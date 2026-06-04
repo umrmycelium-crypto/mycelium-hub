@@ -42,12 +42,20 @@ def decompose(text: str, context: dict = None):
     if context:
         # Format recent events for the prompt
         history = "\n".join([f"- {e.get('event')}: {e.get('payload', {}).get('text', '')}" for e in context.get("recent_events", [])])
+        
+        # Format relevant memory (simplified for prompt efficiency)
+        memory = context.get("memory", {})
+        memory_summary = f"Aliases: {memory.get('aliases')}\nFailed Phrases: {list(memory.get('failed_intents', {}).keys())}"
+
         context_block = f"""
 SYSTEM STATE:
 {context.get('state', 'Unknown')}
 
 RECENT HISTORY:
 {history}
+
+PERSISTENT MEMORY (Success Patterns):
+{memory_summary}
 """
 
     prompt = f"""

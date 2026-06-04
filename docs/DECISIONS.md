@@ -29,3 +29,9 @@ Decision: Use Jellyfin as primary media server.
 Reason: High performance, open source, and seamless integration with the local network.
 Date: 2026-06-04
 Status: Accepted
+
+## AD-006
+Decision: Use Jellyseerr instead of Overseerr.
+Reason: Native Jellyfin support; Overseerr requires Plex for library indexing.
+Date: 2026-06-04
+Status: Accepted

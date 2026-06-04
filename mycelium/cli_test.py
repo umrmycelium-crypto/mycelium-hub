@@ -2,10 +2,11 @@ from .router import detect_intent
 from .agents.decomposer import decompose
 from .agents.context_agent import build_context
 from .core.registry import register_all
+from .memory.manager import record_success, record_failure
 import json
 
 def main():
-    print("Mycelium Intent Engine v0.7 (State-Aware Orchestration - Type 'exit' to quit)")
+    print("Mycelium Intent Engine v0.8 (Behavior Adaptive - Type 'exit' to quit)")
 
     # Initialize Registry and Bus
     bus = register_all()
@@ -18,43 +19,58 @@ def main():
             if command.lower() in ["exit", "quit"]:
                 break
 
-            # Build current system context
+            # Build current system context (State + History + Memory)
             context = build_context()
 
-            # Decompose complex input with state awareness
-            print(f"DEBUG: Decomposing input with context...")
+            # Decompose complex input with state and memory awareness
+            print(f"DEBUG: Decomposing input with memory-aware context...")
             events = decompose(command, context)
+
             if not events:
                 print("[UNKNOWN] Could not decompose input.")
                 continue
 
             for i, event_data in enumerate(events):
                 intent = event_data.get("intent", "unknown")
-                payload = event_data.get("entities", {})
-                payload["text"] = command # Include original for fallback
+                entities = event_data.get("entities", {})
 
-                # Debug info per event
+                # Payload construction
+                payload = entities.copy()
+                payload["text"] = command
+
                 print(f"--- Event {i+1}: {intent} ---")
-                if payload:
-                    print(f"DEBUG: Entities: {payload}")
+                if entities:
+                    print(f"DEBUG: Entities: {entities}")
 
                 # Publish to the bus
                 results = bus.publish(intent, payload)
 
                 if not results:
                     print(f"[UNKNOWN] No subscribers for intent: {intent}")
+                    record_failure(intent, command)
                     continue
 
-                # Handle the first result (primary action)
+                # Analyze results for success/failure to update memory
                 result = results[0]
-                print(f"[{result['status'].upper()}] {result['message']}")
+                status = result.get('status', 'unknown')
+
+                print(f"[{status.upper()}] {result['message']}")
+
+                if status in ['success', 'ok']:
+                    # Extract primary entity value for success tracking
+                    entity_val = entities.get('title') or entities.get('query')
+                    if entity_val:
+                        record_success(intent, entity_val)
+                elif status in ['error', 'not_found', 'failed']:
+                    record_failure(intent, command)
 
                 # Special handling for developer analysis
-                if result['intent'] == 'developer.assist' and result['status'] == 'ok':
+                if result['intent'] == 'developer.assist' and status == 'ok':
                      print("\nAnalysis Output:")
                      print(result['data'].get('analysis'))
 
             print("-" * 30)
+
 
         except EOFError:
             break

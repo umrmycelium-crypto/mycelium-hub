@@ -1,0 +1,15 @@
+{
+  "aliases": {},
+  "failed_intents": {
+    "play midsommar": 2,
+    "search notes for jellyfin": 1
+  },
+  "media.play": {},
+  "knowledge.search": {
+    "jellyfin": {
+      "success_count": 1,
+      "failure_count": 0,
+      "last_used": "2026-06-04T19:44:32.923488+00:00"
+    }
+  }
+}
