@@ -1,6 +1,23 @@
+from .jellyfin import search_media
+
 def execute(intent, text):
     if intent == "media.play":
-        print(f"[MEDIA] Action: Play matching content for: '{text}'")
+        # Extract title (naively for v0)
+        title = text.lower().replace("play", "").replace("watch", "").replace("start", "").strip()
+        print(f"[MEDIA] Searching Jellyfin for: '{title}'")
+        
+        results = search_media(title)
+        
+        if "error" in results:
+            print(f"[MEDIA] Error: {results['error']}")
+        elif not results.get("Items"):
+            print(f"[MEDIA] No matches found in library for: '{title}'")
+        else:
+            items = results["Items"]
+            print(f"[MEDIA] Found {len(items)} match(es):")
+            for item in items:
+                print(f" - {item.get('Name')} ({item.get('Type')}) - ID: {item.get('Id')}")
+            
     elif intent == "media.search":
         print(f"[MEDIA] Action: Searching for: '{text}'")
     elif intent == "system.status":
