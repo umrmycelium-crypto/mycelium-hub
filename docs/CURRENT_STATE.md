@@ -56,11 +56,9 @@ TV connectivity:
 Successful
 
 ### Obsidian
+Status: Installed
+Purpose: Knowledge vault
 
-Status:
-Installed
-
-Purpose:
-Knowledge vault
-Long-term memory
-Project documentation
+### ARR Stack (Radarr, Sonarr, Overseerr, qBittorrent)
+Status: Operational
+Purpose: Media acquisition and management
