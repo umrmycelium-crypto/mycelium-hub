@@ -16,9 +16,15 @@ def detect_intent(text):
 
     for intent, keywords in INTENTS.items():
         for keyword in keywords:
-            # Use partial_ratio to find keywords within the command string
-            score = fuzz.partial_ratio(keyword.lower(), text)
-            if score > 85 and score > best_score:
+            keyword = keyword.lower()
+            # If keyword is directly in text, it's a very strong match
+            if keyword in text:
+                score = 100
+            else:
+                # Fallback to fuzzy matching
+                score = fuzz.partial_ratio(keyword, text)
+            
+            if score > 80 and score > best_score:
                 best_score = score
                 best_intent = intent
 

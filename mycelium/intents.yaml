@@ -2,6 +2,7 @@ media.play:
   - play
   - watch
   - stream
+  - start
 
 media.search:
   - find
@@ -11,11 +12,14 @@ system.status:
   - status
   - health
   - check
+  - system
+  - doing
 
 knowledge.search:
   - note
   - knowledge
   - obsidian
+  - thought
 
 developer.assist:
   - code
