@@ -1,31 +1,41 @@
-from collections import defaultdict
+from mycelium.core.event_store import append_event
+from mycelium.core.projections import apply_live
+
 
 class EventBus:
-    """
-    A synchronous event bus supporting type-specific and global '*' subscribers.
-    """
     def __init__(self):
-        self.subscribers = defaultdict(list)
+        self.subscribers = []
+        self.post_hooks = []
 
-    def subscribe(self, event_type, handler):
-        """
-        Registers a handler for a specific event type or '*' for all events.
-        """
-        self.subscribers[event_type].append(handler)
+    def subscribe(self, fn):
+        self.subscribers.append(fn)
 
-    def publish(self, event_type, payload):
-        """
-        Notifies all subscribers and then global '*' hooks.
-        """
+    def subscribe_post(self, fn):
+        self.post_hooks.append(fn)
+
+    def publish(self, event: dict):
+
+        append_event(event)
+        apply_live(event)
+
         results = []
-        
-        # 1. Notify specific subscribers
-        for handler in self.subscribers.get(event_type, []):
-            results.append(handler(payload))
 
-        # 2. Notify global '*' subscribers (traceability/logging)
-        for handler in self.subscribers.get("*", []):
-            # Global handlers receive (type, payload, results) for context
-            handler(event_type, payload, results)
+        for sub in self.subscribers:
+            try:
+                results.append(sub(event))
+            except Exception as e:
+                results.append({"error": str(e)})
+
+        # -----------------------------
+        # POST HOOKS (non-blocking logic)
+        # -----------------------------
+        for hook in self.post_hooks:
+            try:
+                hook(event)
+            except Exception:
+                pass
 
         return results
+
+
+EVENT_BUS = EventBus()

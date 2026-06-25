@@ -1,0 +1,83 @@
+#!/bin/bash
+
+set -e
+
+BASE="$PWD"
+
+API_PORT=8000
+UI_PORT=8082
+
+echo "🧠 Mycelium Runtime Launcher"
+
+# ----------------------------
+# CLEANUP OLD PROCESSES
+# ----------------------------
+
+echo "🧹 Cleaning old processes..."
+
+pkill -f "uvicorn daemon.server:app" >/dev/null 2>&1 || true
+pkill -f "http.server $UI_PORT" >/dev/null 2>&1 || true
+
+sleep 1
+
+# ----------------------------
+# START API
+# ----------------------------
+
+echo "🚀 Starting FastAPI (cognition engine)..."
+
+( 
+  cd "$BASE"
+  ./run.sh
+) &
+
+API_PID=$!
+
+sleep 2
+
+# ----------------------------
+# START UI SERVER
+# ----------------------------
+
+echo "🌐 Starting dashboard server..."
+
+(
+  cd "$BASE"
+  python3 -m http.server $UI_PORT
+) &
+
+UI_PID=$!
+
+sleep 2
+
+# ----------------------------
+# HEALTH CHECKS
+# ----------------------------
+
+echo "🔍 Checking services..."
+
+if curl -s "http://127.0.0.1:$API_PORT/tick" >/dev/null; then
+  echo "✅ API online: http://127.0.0.1:$API_PORT"
+else
+  echo "❌ API failed"
+fi
+
+if curl -s "http://127.0.0.1:$UI_PORT" >/dev/null; then
+  echo "✅ UI online: http://127.0.0.1:$UI_PORT"
+else
+  echo "❌ UI failed"
+fi
+
+# ----------------------------
+# OUTPUT
+# ----------------------------
+
+echo ""
+echo "🧠 Mycelium is now running"
+echo "--------------------------------"
+echo "API: http://127.0.0.1:$API_PORT"
+echo "UI : http://127.0.0.1:$UI_PORT"
+echo "WS : ws://127.0.0.1:$API_PORT/ws"
+echo "--------------------------------"
+
+wait

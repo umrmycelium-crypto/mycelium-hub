@@ -1,0 +1,8 @@
+Category,Amount,Percentage,Purpose,Priority
+Development,$8000,53.33%,"Continue building, add features, improve stability",High
+Hosting,$2000,13.33%,"Keep servers running 24/7, ensure uptime",Critical
+Equipment,$1500,10.00%,"Hardware for development, better performance",Medium
+Marketing,$1500,10.00%,"Reach more people, grow community",Medium
+Legal,$1000,6.67%,"Foundation setup, protect IP",Medium
+Contingency,$1000,6.67%,"Unexpected needs, buffer",High
+Total,$15000,100.00%,"Complete funding goal",

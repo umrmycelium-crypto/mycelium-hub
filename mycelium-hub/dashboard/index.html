@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Mycelium Live Field</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
+  <style>
+    html, body {
+      margin: 0;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+    body {
+      background: #0a0a1a;
+      font-family: monospace;
+    }
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: #7ee7ff;
+      z-index: 10;
+      font-size: 14px;
+      line-height: 1.6;
+      text-shadow: 0 0 5px rgba(126, 231, 255, 0.5);
+    }
+    #stats {
+      position: absolute;
+      top: 60px;
+      left: 10px;
+      color: #a7c7e7;
+      z-index: 10;
+      font-size: 12px;
+      line-height: 1.5;
+      text-shadow: 0 0 5px rgba(167, 199, 231, 0.5);
+      max-width: 80vw;
+      word-wrap: break-word;
+    }
+    #3d {
+      position: absolute;
+      top: 120px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, #0a0a2a 0%, #000000 100%);
+    }
+    #3d canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+    
+    /* Loading indicator */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #7ee7ff;
+      font-size: 24px;
+      z-index: 20;
+      text-shadow: 0 0 10px rgba(126, 231, 255, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+<div id="hud" role="status" aria-live="polite">Mycelium: evolving idea-field</div>
+<div id="stats" role="status" aria-live="polite"></div>
+<div id="3d"></div>
+<div class="loading" id="loading">Loading 3D visualization...</div>
+
+<script type="module">
+import ForceGraph3D from "https://esm.sh/3d-force-graph";
+
+const graphContainer = document.getElementById("3d");
+const loadingEl = document.getElementById("loading");
+
+console.log("Creating graph...");
+
+// Enhanced color palette for nodes
+const getNodeColor = (n) => {
+  const id = n.id || '';
+  const coreNodes = ['seed', 'memory', 'intent', 'origin'];
+  
+  if (coreNodes.includes(id)) {
+    const colors = {
+      'seed': '#00ffaa',
+      'memory': '#ff00aa',
+      'intent': '#00aaff',
+      'origin': '#ffff00'
+    };
+    return colors[id] || '#ffffff';
+  }
+  
+  if (id.startsWith('converged_')) {
+    return '#ff6600';
+  }
+  
+  if (id.startsWith('idea_')) {
+    // Hash the id to get consistent color
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 100%, 60%)`;
+  }
+  
+  return '#7ee7ff';
+};
+
+const Graph = ForceGraph3D()(graphContainer)
+  .backgroundColor("#000000")
+  .nodeLabel(n => n.id)
+  .nodeColor(n => getNodeColor(n))
+  .nodeVal(n => {
+    // Scale node size based on value/strength, with minimum size
+    const val = n.val || n.strength || n.value || 0.1;
+    // Map from [0, 1] to [5, 30] for visible sizes
+    return Math.max(5, Math.min(30, val * 25 + 5));
+  })
+  .nodeOpacity(0.95)
+  .nodeRelSize(4)  // Make nodes 4x larger
+  .linkOpacity(0.15)
+  .linkColor(() => '#444488')
+  .linkWidth(() => 0.5)
+  .d3AlphaDecay(0.05)
+  .d3VelocityDecay(0.1)
+  .warmupTicks(100)
+  .cooldownTicks(100)
+  .onNodeClick(node => {
+    console.log('Clicked node:', node);
+  })
+  .onNodeHover(node => {
+    // Highlight node on hover
+    graphContainer.style.cursor = node ? 'pointer' : 'default';
+  });
+
+console.log("Graph created, container:", graphContainer);
+
+// Hide loading once graph is ready
+Graph.onEngineTick(() => {
+  if (loadingEl) {
+    loadingEl.style.display = 'none';
+  }
+});
+
+// Mark the canvas as decorative for accessibility
+console.log("Setting up canvas observer...");
+const observer = new MutationObserver(() => {
+  const canvas = graphContainer.querySelector('canvas');
+  if (canvas) {
+    console.log("Canvas found, setting aria-hidden");
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', '3D visualization of Mycelium idea-field network');
+    observer.disconnect();
+  }
+});
+observer.observe(graphContainer, { childList: true });
+
+let nodes = [];
+let links = [];
+
+Graph.graphData({ nodes, links });
+
+console.log("Connecting to WebSocket...");
+const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+
+ws.onopen = () => {
+  console.log("WebSocket connected!");
+  loadingEl.textContent = "Connected! Loading data...";
+};
+
+ws.onerror = (e) => {
+  console.log("WebSocket error:", e);
+  loadingEl.textContent = "Connection error. Retrying...";
+  // Try to reconnect after 3 seconds
+  setTimeout(() => {
+    window.location.reload();
+  }, 3000);
+};
+
+let lastTick = 0;
+let connectionLost = false;
+
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+  const state = msg.payload;
+  
+  if (connectionLost) {
+    loadingEl.style.display = 'none';
+    connectionLost = false;
+  }
+
+  // Update HUD with intent field
+  const intentField = state.intent_field ? state.intent_field.toFixed(3) : '0.000';
+  document.getElementById('hud').textContent = 
+    `Mycelium: evolving idea-field | Intent Field: ${intentField} | Tick: ${state.tick || 0}`;
+
+  // Update stats
+  const ideaCount = (state.ideas || []).length;
+  const avgIdeaStrength = state.ideas && state.ideas.length > 0 ? 
+    (state.ideas.reduce((sum, idea) => sum + (idea.strength || 0), 0) / ideaCount).toFixed(3) : '0.000';
+  
+  const nodeStats = Object.entries(state.nodes || {})
+    .map(([id, val]) => `${id}: ${(val.activation || val).toFixed(3)}`)
+    .join(' | ');
+  
+  document.getElementById('stats').textContent = 
+    `Ideas: ${ideaCount} | Avg Strength: ${avgIdeaStrength} | ${nodeStats}`;
+
+  const data = state.nodes;
+
+  // --- update core nodes ---
+  for (const [id, value] of Object.entries(data)) {
+    let node = nodes.find(n => n.id === id);
+
+    if (!node) {
+      node = { id, val: value.activation || value };
+      nodes.push(node);
+    } else {
+      node.val = value.activation || value;
+    }
+  }
+
+  // --- ideas as evolving nodes ---
+  for (const idea of state.ideas || []) {
+    let node = nodes.find(n => n.id === idea.id);
+
+    if (!node) {
+      nodes.push({
+        id: idea.id,
+        val: idea.strength || idea.value || 0.5,
+        strength: idea.strength || idea.value || 0.5
+      });
+    } else {
+      node.val = idea.strength || idea.value || 0.5;
+      node.strength = idea.strength || idea.value || 0.5;
+    }
+  }
+
+  // Add some links between nodes for visualization
+  // Connect core nodes
+  const coreNodes = ['seed', 'memory', 'intent', 'origin'];
+  for (let i = 0; i < coreNodes.length; i++) {
+    for (let j = i + 1; j < coreNodes.length; j++) {
+      const from = coreNodes[i];
+      const to = coreNodes[j];
+      const linkId = `${from}-${to}`;
+      
+      if (!links.find(l => l.id === linkId)) {
+        links.push({
+          id: linkId,
+          source: from,
+          target: to,
+          value: 0.5
+        });
+      }
+    }
+  }
+
+  // Connect ideas to core nodes based on their type
+  for (const idea of state.ideas || []) {
+    const ideaId = idea.id;
+    if (!ideaId) continue;
+    
+    // Connect to intent node
+    const intentLinkId = `${ideaId}-intent`;
+    if (!links.find(l => l.id === intentLinkId)) {
+      links.push({
+        id: intentLinkId,
+        source: ideaId,
+        target: 'intent',
+        value: 0.2
+      });
+    }
+    
+    // Connect converged ideas to memory and seed
+    if (ideaId.startsWith('converged_')) {
+      const seedLinkId = `${ideaId}-seed`;
+      if (!links.find(l => l.id === seedLinkId)) {
+        links.push({
+          id: seedLinkId,
+          source: ideaId,
+          target: 'seed',
+          value: 0.3
+        });
+      }
+      
+      const memoryLinkId = `${ideaId}-memory`;
+      if (!links.find(l => l.id === memoryLinkId)) {
+        links.push({
+          id: memoryLinkId,
+          source: ideaId,
+          target: 'memory',
+          value: 0.3
+        });
+      }
+    }
+  }
+
+  Graph.graphData({ nodes, links });
+  
+  // Log progress occasionally
+  if (state.tick % 100 === 0) {
+    console.log(`Tick: ${state.tick}, Nodes: ${nodes.length}, Links: ${links.length}`);
+  }
+};
+
+// Check connection status periodically
+setInterval(() => {
+  if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+    connectionLost = true;
+    loadingEl.style.display = 'block';
+    loadingEl.textContent = 'Connection lost. Reconnecting...';
+    // Force reconnect
+    ws.close();
+    // Recreate websocket after a delay
+    setTimeout(() => {
+      window.location.reload();
+    }, 5000);
+  }
+}, 10000);
+
+console.log("Dashboard initialized!");
+</script>
+
+</body>
+</html>

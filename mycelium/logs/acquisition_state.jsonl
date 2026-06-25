@@ -1,0 +1,2 @@
+{"timestamp": 1780621085.2326572, "title": "midsommar", "status": "FAILED_SEARCH", "payload": {}}
+{"timestamp": 1780621085.243916, "title": "midsommar", "status": "REQUESTED", "payload": {"status_code": 400, "response": {"message": "request.body should have required property 'mediaId'", "errors": [{"path": ".body.mediaId", "message": "should have required property 'mediaId'", "errorCode": "required.openapi.validation"}]}}}

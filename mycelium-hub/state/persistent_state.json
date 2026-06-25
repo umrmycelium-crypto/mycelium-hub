@@ -1,0 +1,35 @@
+{
+  "identity": {
+    "birth_tick": 0,
+    "version": 1,
+    "signature": "mycelium-core"
+  },
+  "tick": 0,
+  "intent": 0.5,
+
+  "evolution_params": {
+    "noise": 0.04,
+    "learning_rate": 0.02,
+    "mutation_rate": 0.05
+  },
+
+  "ideas": {
+    "idea_1": {
+      "value": 0.6,
+      "tags": ["seed"],
+      "phase": 0.0,
+      "parent": null
+    },
+    "idea_2": {
+      "value": 0.4,
+      "tags": ["memory"],
+      "phase": 1.0,
+      "parent": null
+    }
+  },
+
+  "memory": [],
+  "crystals": [],
+  "lineage": [],
+  "goals": []
+}

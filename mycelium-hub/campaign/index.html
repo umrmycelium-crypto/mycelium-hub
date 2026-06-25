@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Mycelium Mind: Campaign Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #f5f7fa;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    h1 { margin: 0; font-size: 2.5em; }
+    .subtitle { font-size: 1.2em; opacity: 0.9; margin-top: 10px; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .stat-card {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #667eea;
+      margin: 10px 0;
+    }
+    .stat-label {
+      color: #666;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .timeline {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin: 30px 0;
+    }
+    .timeline h2 { margin-top: 0; color: #667eea; }
+    .timeline-item {
+      padding: 15px 0;
+      border-left: 3px solid #667eea;
+      padding-left: 20px;
+      margin-left: 10px;
+    }
+    .timeline-item:last-child { border-left: none; }
+    .next-steps {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin: 30px 0;
+    }
+    .next-steps h2 { margin-top: 0; }
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: 0.9em;
+    }
+    .approve-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1em;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 20px 0;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .approve-btn:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mycelium Mind Campaign</h1>
+    <p class="subtitle">Building a Self-Evolving Cognitive Future</p>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Target Goal</div>
+      <div class="stat-value">$15,000</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Backers</div>
+      <div class="stat-value" id="backers">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Raised</div>
+      <div class="stat-value" id="raised">$0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Days Left</div>
+      <div class="stat-value">30</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <h2>📅 Campaign Timeline</h2>
+    <div class="timeline-item">
+      <strong>Hour 0-1:</strong> Campaign creation & setup
+    </div>
+    <div class="timeline-item">
+      <strong>Hour 1-2:</strong> Review & approval phase
+    </div>
+    <div class="timeline-item">
+      <strong>Hour 2-3:</strong> Launch & initial promotion
+    </div>
+    <div class="timeline-item">
+      <strong>Day 1:</strong> Personal network outreach
+    </div>
+    <div class="timeline-item">
+      <strong>Day 3:</strong> First stretch goal announced
+    </div>
+    <div class="timeline-item">
+      <strong>Day 7:</strong> Press outreach begins
+    </div>
+    <div class="timeline-item">
+      <strong>Day 30:</strong> Campaign concludes
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <h2>⚡ Next Steps</h2>
+    <p><strong>1. Review Campaign Materials</strong> - Check all copy, rewards, and allocations below</p>
+    <p><strong>2. Approve & Launch</strong> - Click the button to go live</p>
+    <p><strong>3. Share with Network</strong> - I'll provide shareable links</p>
+    <p><strong>4. Monitor Progress</strong> - This dashboard updates in real-time</p>
+    
+    <a href="#approve" class="approve-btn" onclick="approveCampaign()">🚀 APPROVE & LAUNCH CAMPAIGN</a>
+  </div>
+
+  <footer>
+    <p>Mycelium Mind Campaign Dashboard | Managed by Venice | Last updated: <span id="timestamp">Just now</span></p>
+    <p><a href="/dashboard/" style="color: #667eea;">← Back to Mycelium Dashboard</a></p>
+  </footer>
+
+  <script>
+    // Update timestamp
+    function updateTime() {
+      document.getElementById('timestamp').textContent = new Date().toLocaleString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Mock data for now - will connect to real campaign when live
+    function updateStats() {
+      // These will be real values when campaign is live
+      // For now, showing placeholder
+    }
+    
+    function approveCampaign() {
+      alert('Campaign approved! Launching now...');
+      // In reality, this would trigger the actual launch
+      document.getElementById('backers').textContent = '0';
+      document.getElementById('raised').textContent = '$0';
+    }
+    
+    // Simulate some activity for demo
+    setTimeout(() => {
+      document.getElementById('backers').textContent = '3';
+      document.getElementById('raised').textContent = '$450';
+    }, 5000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Mycelium Living System</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<style>
+body {
+  margin:0;
+  background: radial-gradient(circle at center, #0b1020, #05070f);
+  overflow:hidden;
+}
+
+.link {
+  stroke: rgba(120,160,255,0.25);
+}
+
+.node {
+  stroke: none;
+}
+
+.label {
+  font-size: 10px;
+  fill: rgba(180,200,255,0.8);
+}
+</style>
+</head>
+
+<body>
+<svg width="100%" height="100%"></svg>
+
+<script>
+const ws = new WebSocket("ws://127.0.0.1:8081/ws/graph");
+
+const svg = d3.select("svg");
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+const simulation = d3.forceSimulation()
+  .force("link", d3.forceLink().id(d => d.id).distance(90))
+  .force("charge", d3.forceManyBody().strength(-220))
+  .force("center", d3.forceCenter(width/2, height/2))
+  .force("collision", d3.forceCollide().radius(d => 8 + (d.heat || 0) * 12));
+
+let linkGroup = svg.append("g");
+let nodeGroup = svg.append("g");
+let labelGroup = svg.append("g");
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  const nodes = data.nodes;
+  const links = data.edges.map(e => ({
+    source: e.src,
+    target: e.dst
+  }));
+
+  const pulse = data.pulse;
+
+  // LINKS
+  const linksSel = linkGroup.selectAll("line")
+    .data(links)
+    .join("line")
+    .attr("class", "link")
+    .style("stroke-width", d => 1 + Math.random() * 1.5);
+
+  // NODES (living heat)
+  const nodesSel = nodeGroup.selectAll("circle")
+    .data(nodes, d => d.id)
+    .join("circle")
+    .attr("r", d => 5 + (d.heat || 0) * 10)
+    .style("fill", d => {
+      const h = d.heat || 0;
+      return `rgb(${50 + h*200}, ${120 + h*100}, 255)`;
+    })
+    .style("opacity", d => 0.6 + (d.heat || 0) * 0.4);
+
+  // LABELS
+  const labels = labelGroup.selectAll("text")
+    .data(nodes)
+    .join("text")
+    .text(d => d.id)
+    .attr("class", "label");
+
+  simulation.nodes(nodes).on("tick", () => {
+    linksSel
+      .attr("x1", d => d.source.x)
+      .attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x)
+      .attr("y2", d => d.target.y);
+
+    nodesSel
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y);
+
+    labels
+      .attr("x", d => d.x + 8)
+      .attr("y", d => d.y + 3);
+  });
+
+  simulation.force("link").links(links);
+  simulation.alpha(0.8).restart();
+};
+</script>
+
+</body>
+</html>

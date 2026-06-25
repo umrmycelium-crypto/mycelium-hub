@@ -1,0 +1,16 @@
+{
+  "system": "mycelium-hub",
+  "timestamp": "2026-06-10T19:17:53-06:00",
+  "active_ports": {
+    "dashboard": 8081
+  },
+  "services": {
+    "uvicorn": "dashboard_server",
+    "websocket": true
+  },
+  "graph_mode": "self_perception",
+  "runtime": {
+    "trace_enabled": true,
+    "ws_enabled": true
+  }
+}
