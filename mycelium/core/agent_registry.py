@@ -1,4 +1,4 @@
-from mycelium.core.agent import Agent
+from mycelium.core.agent import MyceliumAgent
 from mycelium.runtime.media import media_play, media_search
 from mycelium.runtime.developer import developer_handler
 from mycelium.runtime.knowledge import knowledge_handler
@@ -33,31 +33,29 @@ def developer_agent(payload, context):
 
 
 AGENTS = {
-    "media_agent": Agent(
+    "media_agent": MyceliumAgent(
         name="media_agent",
         capabilities=["media.play", "media.search", "media.agent"],
         handler=media_agent
     ),
 
-    "system_agent": Agent(
+    "system_agent": MyceliumAgent(
         name="system_agent",
         capabilities=["system.status", "system.deploy"],
         handler=system_agent
     ),
 
-    "knowledge_agent": Agent(
+    "knowledge_agent": MyceliumAgent(
         name="knowledge_agent",
         capabilities=["knowledge.search"],
         handler=knowledge_agent
     ),
 
-    "developer_agent": Agent(
+    "developer_agent": MyceliumAgent(
         name="developer_agent",
         capabilities=["developer.assist"],
         handler=developer_agent
     ),
-}
-
 }
 
 
