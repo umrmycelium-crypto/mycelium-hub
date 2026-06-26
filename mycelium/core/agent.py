@@ -6,6 +6,11 @@ class MyceliumAgent:
     Unified dict-intent agent runtime.
     """
 
+    def __init__(self, name: str, capabilities: list, handler):
+        self.name = name
+        self.capabilities = capabilities
+        self.handler = handler
+
     def run(self, task: dict):
         # HARD STANDARDIZATION: dict-only intent
         intent = self.normalize(task)
