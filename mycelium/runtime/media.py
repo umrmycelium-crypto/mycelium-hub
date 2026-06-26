@@ -34,3 +34,26 @@ def media_play(payload, context):
         "mediaId": media_id,
         "session_result": result
     }
+
+
+def media_search(payload, context):
+    query = payload.get("query") or payload.get("title") or "unknown"
+
+    # In a real implementation, search_media might return a list. 
+    # For now, we'll wrap the single item return to maintain consistency.
+    item = search_media(query)
+
+    if not item:
+        return {
+            "status": "OK",
+            "action": "media.search",
+            "query": query,
+            "results": []
+        }
+
+    return {
+        "status": "OK",
+        "action": "media.search",
+        "query": query,
+        "results": [item]
+    }

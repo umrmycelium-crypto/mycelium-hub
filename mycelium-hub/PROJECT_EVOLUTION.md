@@ -310,6 +310,9 @@ This is **literally** what Mycelium does now, but at a **cognitive level**:
 | June 11, 2026 | Test framework created | `tests/unit/test_idea_field.py` | Verification |
 | June 11, 2026 | Community docs created | `docs/COMMUNITY.md` | Sharing |
 | June 11, 2026 | Technical docs created | `docs/IDEA_FIELD.md` | Documentation |
+| June 12, 2026 | Implement `media.status` intent | `mycelium/media.py` | Radarr/Sonarr queue visibility |
+| June 24, 2026 | Major feature expansion | System-wide | Significant addition of new components and features |
+| June 26, 2026 | Session recovery & context sync | Gemini CLI | Restoring session and mapping current state |
 
 #### Files Modified on Forged Intent:
 
@@ -501,6 +504,6 @@ And just like the idea-field itself, the evolution is:
 *"Change is possible, one cleared counter at a time."*  
 *"Change is possible, one evolved idea at a time."*
 
-**Last Updated**: June 11, 2026  
+**Last Updated**: June 26, 2026  
 **Status**: Living Document  
 **Next Update**: When new events occur or understanding deepens

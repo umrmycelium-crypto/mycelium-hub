@@ -2,6 +2,7 @@ import yaml
 import os
 from rapidfuzz import fuzz
 from .agents.router_agent import route_intent
+from .core.agent_router import AgentRouter
 
 # Load intents relative to this file's location
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -43,3 +44,46 @@ def detect_intent(text):
         "confidence": best_score / 100.0,
         "entities": {"query": text} # Fallback puts raw text in query
     }
+
+def dispatch_intent(text):
+    """
+    The complete execution flow:
+    1. Detect the intent from the raw text.
+    2. Resolve the agent responsible for that intent.
+    3. Execute the agent's handler with the extracted entities.
+    """
+    # 1. Detect
+    intent_data = detect_intent(text)
+    intent_name = intent_data.get("intent")
+    
+    if intent_name == "unknown":
+        return {
+            "status": "ERROR",
+            "message": f"Could not resolve intent for input: '{text}'"
+        }
+
+    # 2. Resolve
+    agent = AgentRouter.resolve(intent_name)
+    if not agent:
+        return {
+            "status": "ERROR",
+            "message": f"No agent registered for intent: '{intent_name}'"
+        }
+
+    # 3. Execute
+    try:
+        # We pass the entities as the payload to the handler
+        result = agent.handler(intent_data.get("entities", {}), {})
+        return {
+            "status": "OK",
+            "intent": intent_name,
+            "agent": agent.name,
+            "result": result
+        }
+    except Exception as e:
+        return {
+            "status": "ERROR",
+            "intent": intent_name,
+            "agent": agent.name,
+            "message": f"Execution failed: {str(e)}"
+        }

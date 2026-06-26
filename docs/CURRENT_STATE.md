@@ -59,6 +59,6 @@ Successful
 Status: Installed
 Purpose: Knowledge vault
 
-### ARR Stack (Radarr, Sonarr, Overseerr, qBittorrent)
+### ARR Stack (Radarr, Sonarr, Jellyseerr, qBittorrent)
 Status: Operational
 Purpose: Media acquisition and management

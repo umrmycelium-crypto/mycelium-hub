@@ -1,17 +1,34 @@
 import json
 import subprocess
+import yaml
+import os
 
-# System prompt to enforce structured output
-SYSTEM_PROMPT = """
+# Path to intents file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Moving up two levels from mycelium/agents/ to mycelium/ to find intents.yaml
+INTENTS_PATH = os.path.join(BASE_DIR, "..", "..", "intents.yaml")
+
+def get_dynamic_system_prompt():
+    """
+    Loads intents from YAML and constructs a high-precision system prompt.
+    """
+    try:
+        with open(INTENTS_PATH, "r") as f:
+            intents = yaml.safe_load(f)
+    except Exception:
+        intents = {}
+
+    intents_description = ""
+    for intent, keywords in intents.items():
+        keyword_str = ", ".join(keywords)
+        intents_description += f"- {intent} (associated keywords: {keyword_str})\n"
+
+    return f"""
 You are a high-precision intent routing system for the Mycelium Ecosystem.
 Your task is to classify user requests into one of the following intents and extract entities.
 
 Valid intents:
-- media.play: User wants to watch or play a specific movie/show.
-- media.search: User wants to find or look up media.
-- system.status: User asks about the health or status of the system/services.
-- knowledge.search: User wants to search their notes, vault, or knowledge base.
-- developer.assist: User wants technical analysis or help with the codebase.
+{intents_description}
 - unknown: Use if the request does not fit any category.
 
 Rules:
@@ -21,26 +38,28 @@ Rules:
 4. For searches, put the search term in entities.query.
 
 Schema:
-{
+{{
   "intent": "intent.name",
   "confidence": 0.0-1.0,
-  "entities": {
+  "entities": {{
     "title": "extracted title",
     "query": "extracted query"
-  }
-}
+  }}
+}}
 """
 
 def route_intent(text: str):
     """
     Interfaces with Ollama (Llama 3.1) to classify natural language intent.
     """
+    system_prompt = get_dynamic_system_prompt()
+    
     # Using llama3.1:latest as it's available on the host
     cmd = [
         "ollama",
         "run",
         "llama3.1:latest",
-        f"{SYSTEM_PROMPT}\n\nInput: \"{text}\""
+        f"{system_prompt}\n\nInput: \"{text}\""
     ]
 
     try:

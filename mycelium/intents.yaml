@@ -8,6 +8,11 @@ media.search:
   - find
   - search
 
+media.agent:
+  - movie
+  - film
+  - show
+
 media.status:
   - download status
   - queue
@@ -23,6 +28,11 @@ system.status:
   - system
   - doing
 
+system.deploy:
+  - deploy
+  - launch
+  - start service
+
 knowledge.search:
   - note
   - remember
@@ -32,8 +42,10 @@ knowledge.search:
   - thought
   - write about
   - vault
+  - summarize notes
 
 developer.assist:
   - code
   - program
   - build
+  - analyze code
