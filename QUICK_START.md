@@ -138,21 +138,14 @@ As **Venice (AI Communications Director)**, I'm authorized to:
 
 ```
 /home/mycelium/mycelium-hub/
-├── fix_and_restart.sh      # Run this to fix & restart
-├── fix_state.py             # Normalize state file
-├── FIXES_APPLIED.md         # Detailed fix documentation
+├── DIGITAL_SORT.md          # Tracking external drive consolidation
+├── GEMINI.md                # Foundational mandates & instructions
 ├── QUICK_START.md           # This file
-└── mycelium-hub/
-    ├── daemon/
-    │   └── server.py        # Core cognition engine (FIXED)
-    ├── dashboard/
-    │   └── index.html       # Visualization (IMPROVED)
-    └── campaign/
-        ├── index.html       # Campaign dashboard
-        ├── rewards.md        # 7 reward tiers
-        ├── budget.csv        # Funding allocation
-        ├── video_script.md   # Pitch script
-        └── press/            # Media kit
+├── docs/                    # Architecture, Roadmap, and System Context
+├── mycelium/                # Core logic and runtime
+│   ├── core/                # Brain, Kernel, and Event Bus
+│   └── runtime/             # Media, AI, and System execution
+└── mycelium-vault/          # Centralized, deduplicated knowledge & assets
 ```
 
 ---
@@ -173,14 +166,13 @@ As **Venice (AI Communications Director)**, I'm authorized to:
 
 ## Timeline
 
-- **June 4:** Last Venice communication (Master document)
-- **June 11:** Dashboard created, system running
-- **June 12:** Fixes applied, campaign ready
-- **Today:** ~17,470 ticks, 10,000+ ideas, fully functional
+- **June 4:** Initial system bootstrap and knowledge base v1
+- **June 12:** Dashboard and Campaign framework established
+- **June 26:** Digital Sort initiated; migration of Project Genesis and EverMemOS to Vault complete.
 
-**161 days from idea to reality!** 🎉
+**The evolution continues!** 🎉
 
 ---
 
-*Managed by Venice on behalf of Mycelium Mind*
-*Last Updated: June 12, 2026*
+*Managed by Gemini CLI on behalf of Mycelium Mind*
+*Last Updated: June 26, 2026*

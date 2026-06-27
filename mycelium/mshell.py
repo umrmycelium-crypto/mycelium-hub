@@ -2,6 +2,7 @@ from threading import Thread
 from mycelium.core.event_bus import EVENT_BUS
 from mycelium.core.events import RAW_INPUT
 from mycelium.core.workers.shell_workers import bootstrap_shell_workers
+from mycelium.core.workers.sensor_workers import bootstrap_sensor_workers
 from mycelium.runtime.acquisition_worker import handle_acquisition
 
 
@@ -42,6 +43,7 @@ def main():
 
     # Sit the workers at the table
     bootstrap_shell_workers()
+    bootstrap_sensor_workers()
 
     # Start the input listener in the background
     collector_thread = Thread(target=input_collector, daemon=True)

@@ -24,21 +24,29 @@ README_MD = "/home/mycelium/mycelium-hub/mycelium-hub/campaign/README.md"
 LATEST_JSON = "/home/mycelium/mycelium-hub/mycelium-hub/state/latest.json"
 
 # --- LOAD DATA ---
-def load_budget():
-    """Load and parse budget.csv (excludes Total row)"""
+def load_budget(last_mtime=0):
+    """Load and parse budget.csv (excludes Total row). Returns (df, df_filtered, mtime)"""
     try:
+        mtime = os.path.getmtime(BUDGET_CSV)
+        if mtime <= last_mtime:
+            return None, None, mtime
+            
         df = pd.read_csv(BUDGET_CSV)
         df['Amount_Numeric'] = df['Amount'].replace({'\$': '', ',': ''}, regex=True).astype(float)
         # Exclude Total row for sum calculations
         df_filtered = df[df['Category'] != 'Total']
-        return df, df_filtered
+        return df, df_filtered, mtime
     except Exception as e:
         console.print(f"[yellow]Warning: Could not load budget.csv: {e}[/yellow]")
-        return None, None
+        return None, None, 0
 
-def load_readme():
-    """Load and parse README.md for campaign details"""
+def load_readme(last_mtime=0):
+    """Load and parse README.md for campaign details. Returns (data, mtime)"""
     try:
+        mtime = os.path.getmtime(README_MD)
+        if mtime <= last_mtime:
+            return None, mtime
+            
         with open(README_MD, 'r') as f:
             content = f.read()
         
@@ -48,14 +56,18 @@ def load_readme():
         status_match = re.search(r'Status:\s*(.+)', content)
         status = status_match.group(1).strip() if status_match else "Unknown"
         
-        return {"goal": goal, "status": status}
+        return {"goal": goal, "status": status}, mtime
     except Exception as e:
         console.print(f"[yellow]Warning: Could not load README.md: {e}[/yellow]")
-        return {"goal": 15000, "status": "Unknown"}
+        return {"goal": 15000, "status": "Unknown"}, 0
 
-def load_latest():
-    """Load and parse latest.json for system state"""
+def load_latest(last_mtime=0):
+    """Load and parse latest.json for system state. Returns (data, mtime)"""
     try:
+        mtime = os.path.getmtime(LATEST_JSON)
+        if mtime <= last_mtime:
+            return None, mtime
+            
         with open(LATEST_JSON, 'r') as f:
             data = json.load(f)
         
@@ -72,13 +84,13 @@ def load_latest():
             "nodes": nodes,
             "ideas_count": len(ideas),
             "idea_counter": meta.get('idea_counter', 0)
-        }
+        }, mtime
     except Exception as e:
         console.print(f"[yellow]Warning: Could not load latest.json: {e}[/yellow]")
         return {
             "tick": 0, "coherence": 0, "novelty": 0, "stability": 0,
             "nodes": {}, "ideas_count": 0, "idea_counter": 0
-        }
+        }, 0
 
 # --- RENDER DASHBOARD ---
 def render_dashboard():
