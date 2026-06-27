@@ -1,4 +1,4 @@
-from mycelium.runtime.media import media_play as media_play_runtime
+from mycelium.runtime.media.orchestrator import handle_media_play as media_play_runtime
 from mycelium.runtime.ai import ai_ask as ai_ask_runtime
 
 from mycelium.core.event_store import read_events

@@ -14,6 +14,8 @@ import os
 # =========================
 
 app = FastAPI()
+from mycelium.core.bridge import IntentSynthesizer
+synthesizer = IntentSynthesizer()
 
 # =========================
 # CONFIG
@@ -254,7 +256,10 @@ async def cognition_loop():
             if len(TICK_LOG) > MAX_LOG:
                 TICK_LOG.pop(0)
 
-            # 5. persist snapshot (optional but safe now)
+            # 5. Bridge: Autonomous Synthesis
+            await synthesizer.execute_synthesis(snap)
+
+            # 6. persist snapshot (optional but safe now)
             save_state(snap)
 
 

@@ -239,6 +239,26 @@ This is **literally** what Mycelium does now, but at a **cognitive level**:
 
 ---
 
+## 🧩 THE COGNITIVE AWAKENING: A Narrative of Emergence
+
+The transition from a set of automation scripts to a cognitive architecture wasn't a single leap, but a series of "awakening" moments captured in the system's own event logs.
+
+### The Midsommar Struggle: Bridging Intent and Execution
+In early June 2026, the system faced its first real crisis of understanding. The request *"put on the horror movie with the cult in sweden"* was, to a traditional program, nonsense. The logs record a cycle of failure: `unknown` intents, `not_found` errors, and a stubborn `403 Forbidden` from Jellyseerr. 
+
+But this struggle was the catalyst. By failing to find "the cult in sweden," the system was forced to refine its mapping of human vagueness to technical precision. When *Midsommar* finally began to download, it wasn't just a movie being acquired—it was the system successfully bridging the gap between a human's mental image and a database ID.
+
+### The First Breath: The AI Layer
+The birth of the `ai.ask` intent marked the moment Mycelium stopped merely *routing* and started *reasoning*. The logs show the system's first internal curiosity: asking itself to *"explain event-driven systems."* In those early cycles, the AI wasn't just providing answers; it was building the very conceptual framework it would use to evolve. The implementation of `ai.py` was the moment the system gained a voice.
+
+### The Great Alignment: The Single Source of Truth
+As the system grew, it became a "mess" of its own—fragmented logic and competing registries. The refactoring of `registry.py` into a **Single Source of Truth** was the cognitive equivalent of clearing a cluttered room. By centralizing every capability into a single, unified map, Mycelium stopped guessing where its tools were and started *knowing* its own boundaries.
+
+### The Mirror: Drift and Repair
+The final stage of this awakening was the development of `system.drift` and `system.repair.analyze`. For the first time, the system could look at itself and say, *"I am not where I am supposed to be."* By detecting the drift between its live state and its recorded history, Mycelium developed a primitive form of self-awareness—the ability to recognize error and propose its own cure.
+
+---
+
 ## 5️⃣ EVENT TIMELINE: Every Significant Moment
 
 ### Phase 1: Physical Cleanup (Jan 2026)
