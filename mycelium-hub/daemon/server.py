@@ -259,8 +259,13 @@ async def cognition_loop():
             # 5. Bridge: Autonomous Synthesis
             await synthesizer.execute_synthesis(snap)
 
-            # 6. persist snapshot (optional but safe now)
-            save_state(snap)
+            # 6. persist snapshot (wrapped in try-except to prevent 'seizure' crashes)
+            try:
+                save_state(snap)
+            except Exception as e:
+                print(f"⚠️ State Save Error: {e}")
+
+            # The loop continues even if save fails
 
 
 # =========================
@@ -363,3 +368,7 @@ async def ws(websocket: WebSocket):
                 break
     except Exception:
         pass
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

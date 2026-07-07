@@ -1,6 +1,10 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 import requests
-from mycelium.router import dispatch_intent
+from mycelium.core.intent_engine import engine as intent_engine
+from mycelium.core.kernel import kernel
+from mycelium.core.nervous_bus import nervous_bus, SystemEvent
+from mycelium.core.onboarding import onboarding_manager
+import os
 
 app = Flask(__name__)
 
@@ -12,15 +16,34 @@ SERVICES = {
     "ollama": "http://localhost:11434"
 }
 
-# Global state to track user presence for proactivity
-user_state = {
-    "is_present": False
-}
+# Initialize the OS Kernel on boot
+kernel.start()
+
+# Ensure critical device overrides (Sovereign Presence) are active on boot
+onboarding_manager.trigger_device_connection("LX77F6RP9W", {"model": "iPhone 16 Pro Max", "owner": "Miliana"})
 
 @app.route("/")
 def home():
     return jsonify({
-        "system": "Mycelium Core Online",
+        "system": "Mycelium OS Online",
+        "kernel": "Active",
+        "services": SERVICES
+    })
+
+@app.route("/wolf")
+def wolf_portal():
+    return send_file("mycelium/runtime/portal.html")
+
+@app.route("/architect")
+def architect_portal():
+    return send_file("mycelium/runtime/parent_portal.html")
+
+@app.route("/status")
+def status():
+
+    return jsonify({
+        "system": "Mycelium OS Online",
+        "kernel": "Active",
         "services": SERVICES
     })
 
@@ -39,41 +62,59 @@ def status():
 def vision_presence():
     data = request.json
     status = data.get("status")
-    print(f"👁️ Vision Update: User is {status}")
     
-    # Proactive Greeting Logic
-    if status == "PRESENT" and not user_state["is_present"]:
-        print("✨ User returned. Triggering greeting...")
-        try:
-            requests.post("http://localhost:7001/speak", json={"text": "Welcome back. I'm listening whenever you're ready."}, timeout=2)
-        except Exception as e:
-            print(f"Failed to send greeting: {e}")
-            
-    user_state["is_present"] = (status == "PRESENT")
-    return jsonify({"status": "received"}), 200
+    # Publish presence event to the Nervous Bus
+    # The Kernel will pick this up and decide if a proactive greeting is needed
+    event = SystemEvent(
+        type="user.presence",
+        payload={"status": status},
+        source="vision_sensor"
+    )
+    nervous_bus.publish(event)
+    
+    return jsonify({"status": "event_published"}), 200
 
 @app.route("/ai/<prompt>")
 def ai(prompt):
-    # 1. Attempt Intent Dispatch
-    intent_result = dispatch_intent(prompt)
+    # User-initiated request still goes through the Intent Engine
+    result = intent_engine.process(prompt)
     
-    if intent_result.get("status") == "OK":
+    status = result.get("status")
+    
+    if status == "SUCCESS":
         return jsonify({
             "type": "intent",
-            "intent": intent_result.get("intent"),
-            "agent": intent_result.get("agent"),
-            "response": intent_result.get("result")
+            "intent": result.get("intent"),
+            "response": result.get("result"),
+            "method": result.get("method")
+        })
+    
+    if status == "REQUIRES_CONFIRMATION":
+        return jsonify({
+            "type": "confirmation",
+            "intent": result.get("intent"),
+            "payload": result.get("payload"),
+            "response": result.get("message")
         })
 
-    # 2. Fallback to General AI (Ollama)
-    r = requests.post(SERVICES["ollama"] + "/api/generate", json={
-        "model": "llama3.1",
-        "prompt": prompt,
-        "stream": False
-    })
+    if status == "UNKNOWN_INTENT":
+        try:
+            r = requests.post(SERVICES["ollama"] + "/api/generate", json={
+                "model": "llama3.1",
+                "prompt": prompt,
+                "stream": False
+            })
+            return jsonify({
+                "type": "conversation",
+                "response": r.json().get("response")
+            })
+        except Exception as e:
+            return jsonify({"type": "error", "response": f"Brain error: {str(e)}"}), 500
+
     return jsonify({
-        "type": "conversation",
-        "response": r.json().get("response")
+        "type": "error",
+        "response": result.get("message", "I encountered an error processing that request."),
+        "details": result
     })
 
 if __name__ == "__main__":

@@ -1,51 +1,59 @@
+# Mycelium Semantic Intent Definitions
+# These descriptions are used by the Local Brain to map natural language to system actions.
+
 media.play:
-  - play
-  - watch
-  - stream
-  - start
+  description: "Initiate playback of a specific movie, show, or song on the target device."
+  examples:
+    - "Play Midsommar"
+    - "Put on some music"
+    - "Watch the movie I just found"
 
 media.search:
-  - find
-  - search
+  description: "Search for media content across available libraries (Jellyfin, Jellyseerr)."
+  examples:
+    - "Find Midsommar"
+    - "Search for horror movies from 2019"
+    - "Is Inception available?"
 
 media.agent:
-  - movie
-  - film
-  - show
+  description: "General requests regarding movies, films, or shows that require agentic orchestration (e.g., requesting a new movie)."
+  examples:
+    - "I want to watch Dune 2"
+    - "Find me a good sci-fi movie"
+    - "Add The Matrix to the request list"
 
 media.status:
-  - download status
-  - queue
-  - acquisition
-  - how is the movie
-  - progress
-  - eta
+  description: "Check the status of media acquisition, downloads, or the current queue."
+  examples:
+    - "How is the download coming along?"
+    - "Is my movie finished downloading?"
+    - "What's in the queue?"
 
 system.status:
-  - status
-  - health
-  - check
-  - system
-  - doing
+  description: "Check the overall health, status, or current activity of the Mycelium system."
+  examples:
+    - "System status"
+    - "Are all services running?"
+    - "How is the system doing?"
 
 system.deploy:
-  - deploy
-  - launch
-  - start service
+  description: "Deploy, launch, or restart system services and infrastructure."
+  examples:
+    - "Deploy the new dashboard"
+    - "Restart the media agent"
+    - "Launch the cluster"
 
 knowledge.search:
-  - note
-  - remember
-  - search notes
-  - what did i say
-  - find in vault
-  - thought
-  - write about
-  - vault
-  - summarize notes
+  description: "Search the Obsidian vault for notes, thoughts, or memories."
+  examples:
+    - "What did I note about the kernel?"
+    - "Search my notes for 'Project Mycelium'"
+    - "What are my thoughts on the intent engine?"
+    - "Summarize my notes on cognitive architecture"
 
 developer.assist:
-  - code
-  - program
-  - build
-  - analyze code
+  description: "Request coding assistance, repository analysis, or software development tasks."
+  examples:
+    - "Analyze the current repository"
+    - "Help me fix the bug in the cortex"
+    - "Write a test for the cognitive state manager"

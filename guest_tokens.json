@@ -1,0 +1,20 @@
+{
+    "_-xpOZThpzEShdC-_mtSWw": {
+        "label": "VIP-Founder",
+        "created_at": "2026-07-05T13:11:41.679009",
+        "expiry": "2027-07-05T13:11:41.678988",
+        "permissions": [
+            "read_metrics",
+            "view_field"
+        ]
+    },
+    "i_B9RBeLDmHz6utuRnZY1w": {
+        "label": "Beta-Tester",
+        "created_at": "2026-07-05T13:11:41.696253",
+        "expiry": "2027-07-05T13:11:41.696204",
+        "permissions": [
+            "read_metrics",
+            "view_field"
+        ]
+    }
+}

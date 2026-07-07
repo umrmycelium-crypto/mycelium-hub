@@ -1,0 +1,14 @@
+[Unit]
+Description=Mycelium OS Sovereign Server
+After=network.target
+
+[Service]
+User=mycelium
+WorkingDirectory=/home/mycelium/mycelium-hub
+ExecStart=/home/mycelium/mycelium-hub/venv312/bin/python /home/mycelium/mycelium-hub/app.py
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

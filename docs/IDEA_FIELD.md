@@ -1,4 +1,4 @@
-# Mycelium Idea-Field: Technical Deep Dive
+# Mycelium Idease-Field: Technical Deep Dive
 
 ## Overview
 

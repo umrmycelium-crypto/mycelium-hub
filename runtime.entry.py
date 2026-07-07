@@ -1,6 +1,6 @@
 from mycelium.core.registry import REGISTRY
 from mycelium.core.kernel import execute
-from mycelium.core.cortex.resilient_compile import safe_compile
+from mycelium.core.cortex_runtime.resilient_compile import safe_compile
 from mycelium.core.intent import Intent
 
 

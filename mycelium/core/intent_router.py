@@ -2,38 +2,38 @@ import yaml
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 import os
+from mycelium.llm.ollama_intent import llm_to_intent
 
 class IntentRouter:
     """
-    Routes natural language input to defined intents using keyword matching 
-    and falling back to LLM-based routing if available.
+    Routes natural language input to defined intents using semantic routing via the Local Brain (Ollama).
     """
     
     def __init__(self, intents_file: str = "mycelium/intents.yaml"):
         self.intents_file = intents_file
-        self.intent_map = self._load_intents()
 
-    def _load_intents(self) -> Dict[str, List[str]]:
-        try:
-            with open(self.intents_file, 'r') as f:
-                return yaml.safe_load(f) or {}
-        except Exception as e:
-            print(f"Error loading intents: {e}")
-            return {}
-
-    def route(self, text: str) -> Optional[str]:
+    def route(self, text: str) -> Dict[str, Any]:
         """
-        Matches input text against keywords in intents.yaml.
+        Routes natural language input to a defined intent using the Local Brain.
+        Returns a dictionary containing the intent and any extracted payload.
         """
-        text = text.lower().strip()
+        # Semantic Path: Local Brain (Ollama)
+        llm_result = llm_to_intent(text)
+        if llm_result["status"] == "OK":
+            intent_data = llm_result["intent"]
+            # The intent_data is expected to be the validated JSON from Ollama
+            return {
+                "intent": intent_data.get("intent"),
+                "confidence": intent_data.get("confidence", 0.0),
+                "payload": intent_data.get("payload", {}),
+                "requires_confirmation": intent_data.get("requires_confirmation", False),
+                "method": "semantic"
+            }
         
-        # Simple keyword matching
-        for intent, keywords in self.intent_map.items():
-            for kw in keywords:
-                if kw.lower() in text:
-                    return intent
-        
-        return None
-
-    def get_keywords_for_intent(self, intent: str) -> List[str]:
-        return self.intent_map.get(intent, [])
+        return {
+            "intent": None,
+            "confidence": 0.0,
+            "payload": {},
+            "requires_confirmation": True,
+            "method": "none"
+        }

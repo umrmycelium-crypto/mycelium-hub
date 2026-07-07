@@ -1,0 +1,17 @@
+{
+    "forged-intent": {
+        "os": "Linux",
+        "hardware": [
+            "CPU",
+            "GPU",
+            "RAM"
+        ],
+        "agents": [
+            "MediaAgent",
+            "KnowledgeAgent",
+            "DevelopmentAgent",
+            "SystemAgent"
+        ],
+        "last_seen": "2026-07-05T13:11:07.393940"
+    }
+}

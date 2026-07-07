@@ -1,36 +1,22 @@
-from mycelium.core.agent import MyceliumAgent
+from mycelium.core.agent_base import BaseAgent
+from mycelium.agents.creative_cores import MagnusCore, MilianaCore
 from mycelium.runtime.media import media_play, media_search
 from mycelium.runtime.developer import developer_handler
 from mycelium.runtime.knowledge import knowledge_handler
 from mycelium.runtime.system import system_status, system_deploy
 
+class MyceliumAgent:
+    """
+    A simple wrapper to maintain compatibility between functional handlers 
+    and autonomous agent classes.
+    """
+    def __init__(self, name, capabilities, handler):
+        self.name = name
+        self.capabilities = capabilities
+        self.handler = handler
 
-def media_agent(payload, context):
-    # Route to the specific media action based on the action in the payload
-    # (This will be populated by the router/intent engine)
-    action = payload.get("action", "media.play")
-
-    if action == "media.search":
-        return media_search(payload, context)
-    return media_play(payload, context)
-
-
-def system_agent(payload, context):
-    # Route to the specific system action based on the action in the payload
-    action = payload.get("action", "system.status")
-
-    if action == "system.deploy":
-        return system_deploy(payload, context)
-    return system_status(payload, context)
-
-
-def knowledge_agent(payload, context):
-    return knowledge_handler(payload, context)
-
-
-def developer_agent(payload, context):
-    return developer_handler(payload, context)
-
+    def run(self, task_input):
+        return self.handler(task_input, {})
 
 AGENTS = {
     "media_agent": MyceliumAgent(
@@ -48,14 +34,18 @@ AGENTS = {
     "knowledge_agent": MyceliumAgent(
         name="knowledge_agent",
         capabilities=["knowledge.search"],
-        handler=knowledge_agent
+        handler=knowledge_handler
     ),
 
     "developer_agent": MyceliumAgent(
         name="developer_agent",
         capabilities=["developer.assist"],
-        handler=developer_agent
+        handler=developer_handler
     ),
+
+    "magnus_core": MagnusCore(),
+    "miliana_core": MilianaCore(),
 }
+
 
 

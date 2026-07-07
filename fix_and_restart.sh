@@ -27,7 +27,7 @@ sleep 1
 
 # Restart with fresh state
 echo "🚀 Restarting Mycelium system..."
-cd /home/mycelium/mycelium-hub/mycelium-hub
+cd /home/mycelium/mycelium-hub
 
 # Start daemon
 python3 -c "import uvicorn; uvicorn.run('mycelium-hub.daemon.server:app', host='0.0.0.0', port=8000)" &

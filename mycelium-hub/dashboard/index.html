@@ -1,332 +1,277 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="utf-8"/>
-  <title>Mycelium Live Field</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍄</text></svg>">
-  <style>
-    html, body {
-      margin: 0;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-    }
-    body {
-      background: #0a0a1a;
-      font-family: monospace;
-    }
-    #hud {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: #7ee7ff;
-      z-index: 10;
-      font-size: 14px;
-      line-height: 1.6;
-      text-shadow: 0 0 5px rgba(126, 231, 255, 0.5);
-    }
-    #stats {
-      position: absolute;
-      top: 60px;
-      left: 10px;
-      color: #a7c7e7;
-      z-index: 10;
-      font-size: 12px;
-      line-height: 1.5;
-      text-shadow: 0 0 5px rgba(167, 199, 231, 0.5);
-      max-width: 80vw;
-      word-wrap: break-word;
-    }
-    #3d {
-      position: absolute;
-      top: 120px;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, #0a0a2a 0%, #000000 100%);
-    }
-    #3d canvas {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
-    }
-    
-    /* Loading indicator */
-    .loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #7ee7ff;
-      font-size: 24px;
-      z-index: 20;
-      text-shadow: 0 0 10px rgba(126, 231, 255, 0.8);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mycelium | The Sovereign Cognitive Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import ForceGraph3D from 'https://esm.sh/3d-force-graph';
+        window.ForceGraph3D = ForceGraph3D;
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-seed: #00ffaa;
+            --color-memory: #ff00aa;
+            --color-intent: #00aaff;
+            --bg-dark: #000000;
+            --bg-navy: #0a0a1a;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; transform: scale(1); filter: blur(20px); }
+            50% { opacity: 0.8; transform: scale(1.2); filter: blur(30px); }
+        }
+
+        .glow-sphere {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+            animation: pulse-glow 8s infinite ease-in-out;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass:hover {
+            border-color: var(--color-intent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, var(--color-seed), var(--color-intent), var(--color-memory));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #graph-container {
+            height: 60vh;
+            width: 100%;
+            cursor: move;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body>
 
-<div id="hud" role="status" aria-live="polite">Mycelium: evolving idea-field</div>
-<div id="stats" role="status" aria-live="polite"></div>
-<div id="3d"></div>
-<div class="loading" id="loading">Loading 3D visualization...</div>
+    <div class="glow-sphere w-96 h-96 bg-teal-500/20 top-[-10%] left-[-5%]"></div>
+    <div class="glow-sphere w-80 h-80 bg-blue-500/20 top-[30%] right-[-5%]" style="animation-delay: 2s;"></div>
+    <div class="glow-sphere w-64 h-64 bg-magenta-500/20 bottom-[10%] left-[20%]" style="animation-delay: 4s;"></div>
 
-<script type="module">
-import ForceGraph3D from "https://esm.sh/3d-force-graph";
+    <div class="fixed top-6 left-6 z-50 flex items-center gap-4 glass px-4 py-2 rounded-full mono text-xs">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="text-slate-400">SYSTEM LIVE</span>
+        </div>
+        <div class="h-4 w-px bg-slate-700"></div>
+        <div>TICK: <span id="tick-val" class="text-teal-400">---</span></div>
+        <div>INTENT: <span id="intent-val" class="text-blue-400">---</span></div>
+    </div>
 
-const graphContainer = document.getElementById("3d");
-const loadingEl = document.getElementById("loading");
+    <section class="relative h-screen flex flex-col items-center justify-center text-center px-4">
+        <div class="relative mb-8">
+            <div class="w-32 h-32 bg-teal-500 rounded-full blur-3xl opacity-20 absolute inset-0 animate-pulse"></div>
+            <div class="w-32 h-32 border-2 border-teal-500/50 rounded-full flex items-center justify-center relative z-10 animate-[spin_10s_linear_infinite]">
+                <div class="w-4 h-4 bg-teal-400 rounded-full shadow-[0_0_15px_#00ffaa]"></div>
+            </div>
+        </div>
+        <h1 class="text-6xl md:text-8xl font-bold mb-4 tracking-tighter">
+            The system <span class="text-gradient">IS The One.</span>
+        </h1>
+        <p class="text-slate-400 text-xl max-w-2xl font-light leading-relaxed">
+            A Sovereign Cognitive Ecosystem designed to organize thought, 
+            eliminate cognitive hoarding, and reclaim mental sovereignty.
+        </p>
+        <a href="#realms" class="mt-12 px-8 py-3 bg-white text-black font-bold rounded-full hover:bg-teal-400 transition-colors duration-300">
+            Dive In
+        </a>
+    </section>
 
-console.log("Creating graph...");
+    <section id="realms" class="py-32 px-6 max-w-6xl mx-auto">
+        <div class="text-center mb-24 reveal">
+            <h2 class="text-4xl font-bold mb-4">The Journey of Order</h2>
+            <p class="text-slate-400">From the physical mess to the cognitive field.</p>
+        </div>
 
-// Enhanced color palette for nodes
-const getNodeColor = (n) => {
-  const id = n.id || '';
-  const coreNodes = ['seed', 'memory', 'intent', 'origin'];
-  
-  if (coreNodes.includes(id)) {
-    const colors = {
-      'seed': '#00ffaa',
-      'memory': '#ff00aa',
-      'intent': '#00aaff',
-      'origin': '#ffff00'
-    };
-    return colors[id] || '#ffffff';
-  }
-  
-  if (id.startsWith('converged_')) {
-    return '#ff6600';
-  }
-  
-  if (id.startsWith('idea_')) {
-    // Hash the id to get consistent color
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      hash = id.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const hue = Math.abs(hash) % 360;
-    return `hsl(${hue}, 100%, 60%)`;
-  }
-  
-  return '#7ee7ff';
-};
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass p-8 rounded-3xl reveal" style="transition-delay: 0.1s;">
+                <div class="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center mb-6 text-teal-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">The Physical Realm</h3>
+                <p class="text-slate-400 leading-relaxed">
+                    It began with the "Under My Roof" protocol. We learned that cleaning a house is not about the stuff—it's about showing someone they are not alone in the mess.
+                </p>
+            </div>
 
-const Graph = ForceGraph3D()(graphContainer)
-  .backgroundColor("#000000")
-  .nodeLabel(n => n.id)
-  .nodeColor(n => getNodeColor(n))
-  .nodeVal(n => {
-    // Scale node size based on value/strength, with minimum size
-    const val = n.val || n.strength || n.value || 0.1;
-    // Map from [0, 1] to [5, 30] for visible sizes
-    return Math.max(5, Math.min(30, val * 25 + 5));
-  })
-  .nodeOpacity(0.95)
-  .nodeRelSize(4)  // Make nodes 4x larger
-  .linkOpacity(0.15)
-  .linkColor(() => '#444488')
-  .linkWidth(() => 0.5)
-  .d3AlphaDecay(0.05)
-  .d3VelocityDecay(0.1)
-  .warmupTicks(100)
-  .cooldownTicks(100)
-  .onNodeClick(node => {
-    console.log('Clicked node:', node);
-  })
-  .onNodeHover(node => {
-    // Highlight node on hover
-    graphContainer.style.cursor = node ? 'pointer' : 'default';
-  });
+            <div class="glass p-8 rounded-3xl reveal" style="transition-delay: 0.2s;">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6 text-blue-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">The Digital Realm</h3>
+                <p class="text-slate-400 leading-relaxed">
+                    We expanded to the digital hoard. By unifying fragmented drives and cloud accounts into a Sovereign Vault, we created a stable foundation for knowledge.
+                </p>
+            </div>
 
-console.log("Graph created, container:", graphContainer);
+            <div class="glass p-8 rounded-3xl reveal" style="transition-delay: 0.3s;">
+                <div class="w-12 h-12 bg-magenta-500/20 rounded-lg flex items-center justify-center mb-6 text-magenta-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707M6.858 6.858l.707.707M16.248 15.657l.707.707M12 18a6 6 0 100-12 6 6 0 000 12z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">The Cognitive Realm</h3>
+                <p class="text-slate-400 leading-relaxed">
+                    The ultimate leap. We transformed structured data into an emergent Idea-Field, where intelligence is a property of the network, not a command.
+                </p>
+            </div>
+        </div>
+    </section>
 
-// Hide loading once graph is ready
-Graph.onEngineTick(() => {
-  if (loadingEl) {
-    loadingEl.style.display = 'none';
-  }
-});
+    <section class="py-32 bg-gradient-to-b from-transparent to-black relative overflow-hidden">
+        <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="reveal">
+                <h2 class="text-4xl font-bold mb-6">The Living Engine</h2>
+                <p class="text-slate-400 text-lg mb-8 leading-relaxed">
+                    Mycelium doesn't just process data—it evolves. Using a ReAct loop and a distributed memory mesh, the system perceives, reasons, and acts proactively.
+                </p>
+                <ul class="space-y-4 mono text-sm text-slate-300">
+                    <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-teal-400 rounded-full"></span>
+                        Real-time Semantic Mapping
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
+                        Autonomous Agent Orchestration
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-magenta-400 rounded-full"></span>
+                        Self-Evolving Idea-Field
+                    </li>
+                </ul>
+            </div>
+            <div class="relative reveal">
+                <div id="graph-container" class="rounded-3xl border border-white/10 overflow-hidden shadow-2xl"></div>
+                <div class="absolute bottom-4 left-4 mono text-[10px] text-slate-500 bg-black/50 px-2 py-1 rounded">
+                    LIVING_STATE_STREAM: ACTIVE
+                </div>
+            </div>
+        </div>
+    </section>
 
-// Mark the canvas as decorative for accessibility
-console.log("Setting up canvas observer...");
-const observer = new MutationObserver(() => {
-  const canvas = graphContainer.querySelector('canvas');
-  if (canvas) {
-    console.log("Canvas found, setting aria-hidden");
-    canvas.setAttribute('aria-hidden', 'true');
-    canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', '3D visualization of Mycelium idea-field network');
-    observer.disconnect();
-  }
-});
-observer.observe(graphContainer, { childList: true });
+    <section class="py-32 px-6 text-center max-w-4xl mx-auto reveal">
+        <div class="glass p-12 rounded-[3rem] border-teal-500/20 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-32 w-32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold mb-4">The Mycelium Book</h2>
+            <p class="text-slate-400 text-lg mb-8">
+                "A Blueprint for Cognitive Liberation." <br>
+                The story of how we moved from the physical mess to the cognitive field.
+            </p>
+            <span class="px-4 py-1 bg-white/10 rounded-full text-xs mono text-teal-400 uppercase tracking-widest">Coming Soon</span>
+        </div>
+    </section>
 
-let nodes = [];
-let links = [];
+    <section class="py-32 px-6 text-center reveal">
+        <h2 class="text-5xl font-bold mb-8 tracking-tight">Fuel the Evolution.</h2>
+        <p class="text-slate-400 text-xl max-w-2xl mx-auto mb-12">
+            We are building the first truly sovereign cognitive mesh. Be part of the origin.
+        </p>
+        <a href="/campaign/" class="px-12 py-5 bg-teal-500 text-black font-black text-xl rounded-full hover:scale-105 transition-transform duration-300 shadow-[0_0_30px_rgba(0,255,170,0.4)]">
+            🚀 JOIN THE CAMPAIGN
+        </a>
+    </section>
 
-Graph.graphData({ nodes, links });
+    <footer class="py-12 border-t border-white/5 text-center px-6">
+        <p class="text-slate-500 text-sm mono">
+            &copy; 2026 Mycelium OS. Architected by <span class="text-slate-300">Marcus Dallas George Trepke</span>.
+        </p>
+    </footer>
 
-console.log("Connecting to WebSocket...");
-const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+    <script>
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
 
-ws.onopen = () => {
-  console.log("WebSocket connected!");
-  loadingEl.textContent = "Connected! Loading data...";
-};
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-ws.onerror = (e) => {
-  console.log("WebSocket error:", e);
-  loadingEl.textContent = "Connection error. Retrying...";
-  // Try to reconnect after 3 seconds
-  setTimeout(() => {
-    window.location.reload();
-  }, 3000);
-};
+        async function updateHeartbeat() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                document.getElementById('tick-val').textContent = data.tick || '---';
+                document.getElementById('intent-val').textContent = 
+                    data.intent_field ? data.intent_field.toFixed(3) : '---';
+            } catch (e) {
+                document.getElementById('tick-val').textContent = 'OFFLINE';
+                document.getElementById('intent-val').textContent = 'OFFLINE';
+            }
+        }
+        setInterval(updateHeartbeat, 2000);
+        updateHeartbeat();
 
-let lastTick = 0;
-let connectionLost = false;
-
-ws.onmessage = (event) => {
-  const msg = JSON.parse(event.data);
-  const state = msg.payload;
-  
-  if (connectionLost) {
-    loadingEl.style.display = 'none';
-    connectionLost = false;
-  }
-
-  // Update HUD with intent field
-  const intentField = state.intent_field ? state.intent_field.toFixed(3) : '0.000';
-  document.getElementById('hud').textContent = 
-    `Mycelium: evolving idea-field | Intent Field: ${intentField} | Tick: ${state.tick || 0}`;
-
-  // Update stats
-  const ideaCount = (state.ideas || []).length;
-  const avgIdeaStrength = state.ideas && state.ideas.length > 0 ? 
-    (state.ideas.reduce((sum, idea) => sum + (idea.strength || 0), 0) / ideaCount).toFixed(3) : '0.000';
-  
-  const nodeStats = Object.entries(state.nodes || {})
-    .map(([id, val]) => `${id}: ${(val.activation || val).toFixed(3)}`)
-    .join(' | ');
-  
-  document.getElementById('stats').textContent = 
-    `Ideas: ${ideaCount} | Avg Strength: ${avgIdeaStrength} | ${nodeStats}`;
-
-  const data = state.nodes;
-
-  // --- update core nodes ---
-  for (const [id, value] of Object.entries(data)) {
-    let node = nodes.find(n => n.id === id);
-
-    if (!node) {
-      node = { id, val: value.activation || value };
-      nodes.push(node);
-    } else {
-      node.val = value.activation || value;
-    }
-  }
-
-  // --- ideas as evolving nodes ---
-  for (const idea of state.ideas || []) {
-    let node = nodes.find(n => n.id === idea.id);
-
-    if (!node) {
-      nodes.push({
-        id: idea.id,
-        val: idea.strength || idea.value || 0.5,
-        strength: idea.strength || idea.value || 0.5
-      });
-    } else {
-      node.val = idea.strength || idea.value || 0.5;
-      node.strength = idea.strength || idea.value || 0.5;
-    }
-  }
-
-  // Add some links between nodes for visualization
-  // Connect core nodes
-  const coreNodes = ['seed', 'memory', 'intent', 'origin'];
-  for (let i = 0; i < coreNodes.length; i++) {
-    for (let j = i + 1; j < coreNodes.length; j++) {
-      const from = coreNodes[i];
-      const to = coreNodes[j];
-      const linkId = `${from}-${to}`;
-      
-      if (!links.find(l => l.id === linkId)) {
-        links.push({
-          id: linkId,
-          source: from,
-          target: to,
-          value: 0.5
+        window.addEventListener('load', () => {
+            if (window.ForceGraph3D) {
+                const Graph = ForceGraph3D()(document.getElementById('graph-container'))
+                    .backgroundColor("#000000")
+                    .nodeColor(n => {
+                        if (n.id === 'seed') return '#00ffaa';
+                        if (n.id === 'memory') return '#ff00aa';
+                        if (n.id === 'intent') return '#00aaff';
+                        return '#444488';
+                    })
+                    .nodeRelSize(4)
+                    .linkOpacity(0.2)
+                    .linkColor(() => '#222244')
+                    .graphData({
+                        nodes: [{id: 'seed'}, {id: 'memory'}, {id: 'intent'}, {id: 'origin'}],
+                        links: [
+                            {source: 'seed', target: 'memory'},
+                            {source: 'memory', target: 'intent'},
+                            {source: 'intent', target: 'seed'},
+                            {source: 'origin', target: 'seed'},
+                            {source: 'origin', target: 'memory'},
+                        ]
+                    });
+            }
         });
-      }
-    }
-  }
-
-  // Connect ideas to core nodes based on their type
-  for (const idea of state.ideas || []) {
-    const ideaId = idea.id;
-    if (!ideaId) continue;
-    
-    // Connect to intent node
-    const intentLinkId = `${ideaId}-intent`;
-    if (!links.find(l => l.id === intentLinkId)) {
-      links.push({
-        id: intentLinkId,
-        source: ideaId,
-        target: 'intent',
-        value: 0.2
-      });
-    }
-    
-    // Connect converged ideas to memory and seed
-    if (ideaId.startsWith('converged_')) {
-      const seedLinkId = `${ideaId}-seed`;
-      if (!links.find(l => l.id === seedLinkId)) {
-        links.push({
-          id: seedLinkId,
-          source: ideaId,
-          target: 'seed',
-          value: 0.3
-        });
-      }
-      
-      const memoryLinkId = `${ideaId}-memory`;
-      if (!links.find(l => l.id === memoryLinkId)) {
-        links.push({
-          id: memoryLinkId,
-          source: ideaId,
-          target: 'memory',
-          value: 0.3
-        });
-      }
-    }
-  }
-
-  Graph.graphData({ nodes, links });
-  
-  // Log progress occasionally
-  if (state.tick % 100 === 0) {
-    console.log(`Tick: ${state.tick}, Nodes: ${nodes.length}, Links: ${links.length}`);
-  }
-};
-
-// Check connection status periodically
-setInterval(() => {
-  if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
-    connectionLost = true;
-    loadingEl.style.display = 'block';
-    loadingEl.textContent = 'Connection lost. Reconnecting...';
-    // Force reconnect
-    ws.close();
-    // Recreate websocket after a delay
-    setTimeout(() => {
-      window.location.reload();
-    }, 5000);
-  }
-}, 10000);
-
-console.log("Dashboard initialized!");
-</script>
-
+    </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 import json
-from mycelium.core.cortex.llm import call_llm
-from mycelium.core.cortex.runtime import parse_cortex_output
-from mycelium.core.cortex.compiler import build_prompt
+from mycelium.core.cortex_runtime.llm import call_llm
+from mycelium.core.cortex_runtime.runtime import parse_cortex_output
+from mycelium.core.cortex_runtime.compiler import build_prompt
 
 
 def compile_intent(user_input, registry_keys):
