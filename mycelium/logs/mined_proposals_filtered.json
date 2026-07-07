@@ -1,0 +1,24 @@
+[
+  {
+    "name": "auto.#",
+    "reason": "frequent unknown intent pattern",
+    "confidence": 0.3,
+    "risk": "medium",
+    "intent_schema": {
+      "name": "# =========================================================",
+      "payload": {},
+      "context": {}
+    }
+  },
+  {
+    "name": "auto.explain",
+    "reason": "frequent unknown intent pattern",
+    "confidence": 0.3,
+    "risk": "medium",
+    "intent_schema": {
+      "name": "explain event-driiven systems",
+      "payload": {},
+      "context": {}
+    }
+  }
+]

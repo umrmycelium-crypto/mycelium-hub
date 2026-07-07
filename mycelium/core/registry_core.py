@@ -17,3 +17,9 @@ _registry = Registry()
 
 def get_registry():
     return _registry
+
+# Ensure auto-generated handlers are imported so they register themselves.
+try:
+    import mycelium.core.handlers_auto  # registers auto-generated handlers
+except Exception:
+    pass
