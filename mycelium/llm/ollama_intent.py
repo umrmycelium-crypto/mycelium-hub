@@ -4,8 +4,8 @@ import requests
 from pathlib import Path
 from mycelium.core.intent_schema import validate_intent
 from mycelium.core.cognitive_state import cognitive_state
+from mycelium.core.models import get_llm_model, OLLAMA_URL
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
 INTENTS_FILE = "mycelium/intents.yaml"
 
 
@@ -70,7 +70,7 @@ def llm_to_intent(user_text: str) -> dict:
         response = requests.post(
             OLLAMA_URL,
             json={
-                "model": "llama3.1",
+                "model": get_llm_model(),
                 "prompt": full_prompt,
                 "stream": False
             },

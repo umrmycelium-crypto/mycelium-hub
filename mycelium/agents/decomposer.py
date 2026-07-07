@@ -69,10 +69,11 @@ USER INPUT:
 "{text}"
 """
 
+    from mycelium.core.models import get_llm_model
     cmd = [
         "ollama",
         "run",
-        "llama3.1:latest",
+        get_llm_model("llama3.1:latest"),
         prompt
     ]
 

@@ -7,7 +7,7 @@ class MagnusCore(BaseAgent):
     The MagnusCore agent: Epic Scale Architect.
     Specialized in massive world-building and gaming logic.
     """
-    def __init__(self, model: str = "llama3.1"):
+    def __init__(self, model: str = None):
         super().__init__(
             name=MAGNUS_PERSONA["name"],
             personality=MAGNUS_PERSONA["personality"],
@@ -63,7 +63,7 @@ class MilianaCore(BaseAgent):
     The MilianaCore agent: Content Studio Director.
     Specialized in digital storytelling and content creation.
     """
-    def __init__(self, model: str = "llama3.1"):
+    def __init__(self, model: str = None):
         super().__init__(
             name=MILIANA_PERSONA["name"],
             personality=MILIANA_PERSONA["personality"],
@@ -98,11 +98,11 @@ class MilianaCore(BaseAgent):
         return f"Analyzing {topic}... Current trend: High-energy hooks in the first 5 seconds, followed by fast-paced narrative cuts. Similar to Snowi's recent uploads."
 
     def generate_storyboard(self, idea: str) -> str:
-        return f"Storyboard for '{idea}':
+        return f"""Storyboard for '{idea}':
 Scene 1: Establishing shot (Wide)
 Scene 2: Character reaction (Close-up)
 Scene 3: The Twist (Fast cut)
-Scene 4: Call to action (Overlay)."
+Scene 4: Call to action (Overlay)."""
 
     def control_device(self, action: str, params: Dict[str, Any]) -> str:
         # In a real system, this would route the request to the specific device node in the mesh

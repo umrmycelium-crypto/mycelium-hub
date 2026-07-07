@@ -54,11 +54,12 @@ def route_intent(text: str):
     """
     system_prompt = get_dynamic_system_prompt()
     
-    # Using llama3.1:latest as it's available on the host
+    from mycelium.core.models import get_llm_model
+    # Using configured model
     cmd = [
         "ollama",
         "run",
-        "llama3.1:latest",
+        get_llm_model("llama3.1:latest"),
         f"{system_prompt}\n\nInput: \"{text}\""
     ]
 

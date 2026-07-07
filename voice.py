@@ -11,10 +11,11 @@ from flask import Flask, request, jsonify
 from mycelium.core.speech_adaptor import SPEECH_ADAPTOR
 
 # --- Configuration ---
-MODEL_PATH = "models/en_US-lessac-medium.onnx"
-CONFIG_PATH = "models/en_US-lessac-medium.onnx.json"
-WHISPER_MODEL_TYPE = "base"
+from mycelium.core.models import VOICE_MODEL_PATH, VOICE_MODEL_CONFIG, WHISPER_MODEL_TYPE as WHISPER_MODEL_TYPE_CONFIG
 VOICE_SERVER_PORT = 7001
+MODEL_PATH = VOICE_MODEL_PATH
+CONFIG_PATH = VOICE_MODEL_CONFIG
+WHISPER_MODEL_TYPE = WHISPER_MODEL_TYPE_CONFIG
 
 # --- TTS Controller (Handles Interruption) ---
 class SpeechController:

@@ -4,18 +4,17 @@ import os
 from typing import Any, Dict, List, Optional, Callable
 from datetime import datetime
 from mycelium.core.cognitive_state import cognitive_state
-
-OLLAMA_URL = "http://localhost:11434/api/generate"
+from mycelium.core.models import get_llm_model, OLLAMA_URL
 
 class BaseAgent:
     """
     Base class for all Mycelium autonomous agents.
     Implements a ReAct (Reasoning + Acting) loop.
     """
-    def __init__(self, name: str, personality: str, model: str = "llama3.1"):
+    def __init__(self, name: str, personality: str, model: str = None):
         self.name = name
         self.personality = personality
-        self.model = model
+        self.model = model or get_llm_model()
         self.tools = {}
         self.max_iterations = 15
 

@@ -99,8 +99,9 @@ def ai(prompt):
 
     if status == "UNKNOWN_INTENT":
         try:
+            from mycelium.core.models import get_llm_model
             r = requests.post(SERVICES["ollama"] + "/api/generate", json={
-                "model": "llama3.1",
+                "model": get_llm_model(),
                 "prompt": prompt,
                 "stream": False
             })

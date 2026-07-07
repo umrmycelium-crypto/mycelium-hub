@@ -1,0 +1,83 @@
+# Model Configuration for Mycelium OS
+# This file centralizes all model definitions used throughout the system
+
+# Available LLM models for use with Ollama
+LLM_MODELS = {
+    "default": "llama3.1",
+    "llama3.1": "llama3.1",
+    "llama3.1:latest": "llama3.1:latest",
+    "qwen2.5-coder:latest": "qwen2.5-coder:latest",
+    "mycelium-brain:latest": "mycelium-brain:latest",
+}
+
+# Default model to use when none is specified
+DEFAULT_LLM_MODEL = "llama3.1"
+
+# Voice/TTS models
+VOICE_MODEL_PATH = "models/en_US-lessac-medium.onnx"
+VOICE_MODEL_CONFIG = "models/en_US-lessac-medium.onnx.json"
+WHISPER_MODEL_TYPE = "base"
+
+# Ollama service URL
+OLLAMA_URL = "http://localhost:11434/api/generate"
+
+def get_llm_model(model_name: str = None) -> str:
+    """
+    Get an LLM model by name, falling back to default if not found.
+    
+    Args:
+        model_name: Name of the model to retrieve, or None for default
+        
+    Returns:
+        The model identifier string
+    """
+    if model_name is None:
+        return DEFAULT_LLM_MODEL
+    return LLM_MODELS.get(model_name, DEFAULT_LLM_MODEL)
+
+def list_available_models() -> list:
+    """
+    Return a list of all available LLM models.
+    
+    Returns:
+        List of model names
+    """
+    return list(LLM_MODELS.values())
+
+
+def add_model(model_name: str, model_identifier: str = None):
+    """
+    Add a new model to the available models list.
+    
+    Args:
+        model_name: The name/key to use for this model
+        model_identifier: The actual model identifier (defaults to model_name if not provided)
+    """
+    if model_identifier is None:
+        model_identifier = model_name
+    LLM_MODELS[model_name] = model_identifier
+
+
+def remove_model(model_name: str):
+    """
+    Remove a model from the available models list.
+    
+    Args:
+        model_name: The name/key of the model to remove
+    """
+    if model_name in LLM_MODELS:
+        del LLM_MODELS[model_name]
+
+
+def set_default_model(model_name: str):
+    """
+    Set the default model to use when none is specified.
+    
+    Args:
+        model_name: The name/key of the model to use as default
+    """
+    global DEFAULT_LLM_MODEL
+    if model_name in LLM_MODELS:
+        DEFAULT_LLM_MODEL = LLM_MODELS[model_name]
+    else:
+        DEFAULT_LLM_MODEL = model_name
