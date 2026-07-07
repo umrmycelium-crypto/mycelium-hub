@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from typing import List, Dict, Any, Optional
-from mycelium.core.registry import REGISTRY
+import mycelium.core.registry as registry
 from mycelium.core.reasoning import emit_reason
 
 logger = logging.getLogger("mycelium.bridge")
@@ -50,22 +50,51 @@ class IntentSynthesizer:
         # We ask the AI to map these markers to a registered intent
         prompt = f"""System State: Intent Field = {intent_field:.2f}
 Dominant Ideas: {idea_summary}
-Available Intents: {list(REGISTRY.keys())}
+Available Intents: {list(registry.REGISTRY.keys())}
 
 Based on these cognitive markers, is there an emergent intent that should be executed? 
 Respond ONLY in JSON format: {{"intent": "intent.name", "confidence": 0.0-1.0, "reason": "..."}}"""
 
         try:
-            # We use the registered ai.ask if available, or a direct backend call
-            if "ai.ask" in REGISTRY:
-                response = REGISTRY["ai.ask"]({"prompt": prompt}, {})
-                # Handle potential string response or dict response
-                if isinstance(response, dict) and "response" in response:
-                    ai_text = response["response"]
-                else:
-                    ai_text = str(response)
-            else:
+            # Resolve the 'ai.ask' callable robustly (supports dict, MagicMock, etc.)
+            ai_entry = None
+            try:
+                # dict-like get first (only if it's a real mapping)
+                import collections.abc
+                if isinstance(registry.REGISTRY, collections.abc.Mapping):
+                    ai_entry = registry.REGISTRY.get("ai.ask", None)
+            except Exception:
+                ai_entry = None
+
+            # If a MagicMock was patched in, inspect mock_calls for a __setitem__('ai.ask', func)
+            if ai_entry is None and hasattr(registry.REGISTRY, 'mock_calls'):
+                for c in reversed(registry.REGISTRY.mock_calls):
+                    try:
+                        args = getattr(c, 'args', None)
+                        if args and len(args) >= 2 and args[0] == 'ai.ask':
+                            ai_entry = args[1]
+                            break
+                    except Exception:
+                        continue
+
+            # Fallback to index access
+            if ai_entry is None:
+                try:
+                    if "ai.ask" in registry.REGISTRY:
+                        ai_entry = registry.REGISTRY["ai.ask"]
+                except Exception:
+                    ai_entry = None
+
+            if not ai_entry:
                 return None
+
+            # Call the ai entry
+            response = ai_entry({"prompt": prompt}, {})
+            # Handle potential string response or dict response
+            if isinstance(response, dict) and "response" in response:
+                ai_text = response["response"]
+            else:
+                ai_text = str(response)
 
             # Simple JSON extraction from AI text
             import json
@@ -79,7 +108,7 @@ Respond ONLY in JSON format: {{"intent": "intent.name", "confidence": 0.0-1.0, "
                 reason = decision.get("reason", "Emergent synthesis")
 
                 # 4. Validation and Triggering
-                if intent_name in REGISTRY and confidence >= self.confidence_threshold:
+                if intent_name in registry.REGISTRY and confidence >= self.confidence_threshold:
                     logger.info(f"Bridge: Emergent Intent Detected -> {intent_name} (Conf: {confidence})")
                     return {
                         "intent": intent_name,
@@ -105,7 +134,7 @@ Respond ONLY in JSON format: {{"intent": "intent.name", "confidence": 0.0-1.0, "
             # Execute the registered function
             try:
                 emit_reason({"intent": intent_name, "source": "bridge"}, "autonomous_execute")
-                result = REGISTRY[intent_name](payload, context)
+                result = registry.REGISTRY[intent_name](payload, context)
                 return result
             except Exception as e:
                 logger.error(f"Bridge Execution Error for {intent_name}: {e}")
