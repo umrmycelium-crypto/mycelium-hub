@@ -171,3 +171,13 @@
 {"timestamp": 1782506125.920708, "event": null, "payload": {"title": "play"}, "results": []}
 {"timestamp": 1782512091.3675702, "event": "system.reason", "payload": {"intent": null, "stage": "execute", "meta": {}}, "results": []}
 {"timestamp": 1782512091.3715355, "event": null, "payload": {"title": "play"}, "results": []}
+{"timestamp": 1783382223.4304576, "event": "shell.raw_input", "payload": {"text": "explain event-driven systems"}, "results": []}
+{"timestamp": 1783382223.4464626, "event": "shell.intent_resolved", "payload": {"name": "system.unknown", "payload": {"raw": "explain event-driven systems"}, "context": {"source": "mshell", "learnable": true}}, "results": []}
+{"timestamp": 1783382223.4584467, "event": "shell.intent_result", "payload": {"intent": {"name": "system.unknown", "payload": {"raw": "explain event-driven systems"}, "context": {"source": "mshell", "learnable": true}}, "result": {"status": "NO_HANDLER", "intent": "system.unknown"}}, "results": []}
+{"timestamp": 1783382293.9173155, "event": "shell.raw_input", "payload": {"text": "explain event-driven systems"}, "results": []}
+{"timestamp": 1783382293.9293015, "event": "shell.intent_resolved", "payload": {"name": "system.auto.explain", "payload": {"raw": "event-driven systems"}, "context": {"source": "mshell"}}, "results": []}
+{"timestamp": 1783382293.9400742, "event": "shell.intent_result", "payload": {"intent": {"name": "system.auto.explain", "payload": {"raw": "event-driven systems"}, "context": {"source": "mshell"}}, "result": {"status": "NO_HANDLER", "intent": "system.auto.explain"}}, "results": []}
+{"timestamp": 1783382324.50559, "event": "shell.raw_input", "payload": {"text": "explain event-driven systems"}, "results": []}
+{"timestamp": 1783382324.5469744, "event": "shell.intent_resolved", "payload": {"name": "system.auto.explain", "payload": {"raw": "event-driven systems"}, "context": {"source": "mshell"}}, "results": []}
+{"timestamp": 1783382324.5583668, "event": "system.reason", "payload": {"intent": null, "stage": "execute", "meta": {}}, "results": []}
+{"timestamp": 1783382324.5689344, "event": "shell.intent_result", "payload": {"intent": {"name": "system.auto.explain", "payload": {"raw": "event-driven systems"}, "context": {"source": "mshell"}}, "result": {"status": "OK", "type": "knowledge.response", "query": "event-driven systems", "response": "[simulated knowledge engine] received: event-driven systems"}}, "results": []}

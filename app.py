@@ -1,5 +1,14 @@
 from flask import Flask, jsonify, request
 import requests
+import os
+
+# Load environment variables from .env file (if present)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, but env vars can still be set externally
+
 from mycelium.router import dispatch_intent
 
 app = Flask(__name__)

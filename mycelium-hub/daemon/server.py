@@ -9,6 +9,13 @@ import asyncio
 import json
 import os
 
+# Load environment variables from .env file (if present)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, but env vars can still be set externally
+
 # =========================
 # APP
 # =========================
