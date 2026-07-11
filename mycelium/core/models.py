@@ -8,7 +8,12 @@ LLM_MODELS = {
     "llama3.1:latest": "llama3.1:latest",
     "qwen2.5-coder:latest": "qwen2.5-coder:latest",
     "mycelium-brain:latest": "mycelium-brain:latest",
+    "devstral": "devstral",
 }
+
+# Mistral API configuration
+MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
+MISTRAL_API_KEY = None  # Set this to your Mistral API key
 
 # Default model to use when none is specified
 DEFAULT_LLM_MODEL = "llama3.1"
@@ -20,6 +25,9 @@ WHISPER_MODEL_TYPE = "base"
 
 # Ollama service URL
 OLLAMA_URL = "http://localhost:11434/api/generate"
+
+# Llamacpp service URL (for local devstral model)
+LLAMACPP_URL = "http://127.0.0.1:8080/v1/chat/completions"
 
 def get_llm_model(model_name: str = None) -> str:
     """
