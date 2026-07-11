@@ -2,6 +2,30 @@
 
 This guide explains how to connect your local brain to Mistral's API.
 
+## ⚠️ SECURITY WARNING
+
+**NEVER commit API keys to version control!** 
+Always use environment variables.
+
+## Quick Start
+
+```bash
+# 1. Get a new API key from https://console.mistral.ai/
+# 2. Set it as environment variable
+
+# Linux/Mac (add to ~/.bashrc or ~/.zshrc)
+echo 'export MISTRAL_API_KEY="your-new-api-key"' >> ~/.bashrc
+source ~/.bashrc
+
+# Or temporary for this session only
+export MISTRAL_API_KEY="your-new-api-key"
+
+# 3. Test it
+python test_mistral.py
+```
+
+---
+
 ## Problem
 
 The error you're seeing:
@@ -27,10 +51,31 @@ You have three options:
    - Navigate to API Keys section
    - Create a new API key
 
-2. **Configure the API key**
-   Edit `mycelium/core/models.py`:
+2. **Configure the API key SECURELY**
+   
+   **✅ DO THIS (Environment Variable - Recommended):**
+   ```bash
+   # Add to your ~/.bashrc or ~/.zshrc
+   echo 'export MISTRAL_API_KEY="your-api-key-here"' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+   
+   **OR (Temporary for testing):**
+   ```bash
+   export MISTRAL_API_KEY="your-api-key-here"
+   ```
+   
+   **OR (.env file):**
+   ```bash
+   echo "MISTRAL_API_KEY=your-api-key-here" > .env
+   # Then load it before running Python
+   source .env
+   ```
+   
+   **❌ NEVER DO THIS:**
    ```python
-   MISTRAL_API_KEY = "your-api-key-here"
+   # HARDCODED KEYS IN CODE - DANGEROUS!
+   MISTRAL_API_KEY = "your-api-key-here"  # NEVER COMMIT THIS!
    ```
 
 3. **Use Mistral models**

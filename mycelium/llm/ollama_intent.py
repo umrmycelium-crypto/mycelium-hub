@@ -5,6 +5,7 @@ from pathlib import Path
 from mycelium.core.intent_schema import validate_intent
 from mycelium.core.cognitive_state import cognitive_state
 from mycelium.core.models import get_llm_model, OLLAMA_URL
+from mycelium.core.config import is_mistral_configured
 from mycelium.core.llm_runtime import LLMRuntime
 
 INTENTS_FILE = "mycelium/intents.yaml"

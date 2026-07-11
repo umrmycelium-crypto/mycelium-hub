@@ -5,13 +5,14 @@ Supports multiple backends: Ollama, Llamacpp, and Mistral API
 
 import requests
 import json
+import os
 from typing import Optional, Dict, Any
-from mycelium.core.models import (
-    get_llm_model,
-    OLLAMA_URL,
-    LLAMACPP_URL,
-    MISTRAL_API_URL,
-    MISTRAL_API_KEY,
+from mycelium.core.models import get_llm_model, OLLAMA_URL, LLAMACPP_URL
+from mycelium.core.config import (
+    get_mistral_api_key,
+    get_mistral_api_url,
+    require_mistral_key,
+    is_mistral_configured,
 )
 
 
@@ -127,15 +128,11 @@ class LLMRuntime:
                       messages: Optional[list], 
                       temperature: float, max_tokens: int) -> str:
         """Call Mistral API"""
-        if MISTRAL_API_KEY is None:
-            raise RuntimeError(
-                "Mistral API key not configured. "
-                "Set MISTRAL_API_KEY in mycelium/core/models.py"
-            )
+        api_key = require_mistral_key()  # Will raise clear error if not set
         
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {MISTRAL_API_KEY}"
+            "Authorization": f"Bearer {api_key}"
         }
         
         # Build messages
@@ -156,7 +153,7 @@ class LLMRuntime:
         
         try:
             response = requests.post(
-                MISTRAL_API_URL,
+                get_mistral_api_url(),
                 json=payload,
                 headers=headers,
                 timeout=120

@@ -6,3 +6,17 @@ __pycache__/
 .DS_Store
 *.pyc
 tool-outputs/
+
+# Security: Never commit API keys or sensitive config
+.env.local
+.env.*.local
+*.api_key
+*_key*.py
+!test_*.py
+
+# Local configuration files that may contain secrets
+mycelium/core/models.py
+!mycelium/core/models.py.dist
+state/latest.json
+mycelium/logs/
+guest_tokens.json

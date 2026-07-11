@@ -12,6 +12,10 @@ LLM_MODELS = {
 }
 
 # Mistral API configuration
+# IMPORTANT: Do NOT commit your API key to version control!
+# Instead, set it as an environment variable:
+#   export MISTRAL_API_KEY="your-key-here"
+# Or create a .env file with: MISTRAL_API_KEY=your-key-here
 MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
 MISTRAL_API_KEY = None  # Will be loaded from MISTRAL_API_KEY environment variable
 
@@ -29,6 +33,7 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 # Llamacpp service URL (for local devstral model)
 LLAMACPP_URL = "http://127.0.0.1:8080/v1/chat/completions"
 
+
 def get_llm_model(model_name: str = None) -> str:
     """
     Get an LLM model by name, falling back to default if not found.
@@ -43,6 +48,7 @@ def get_llm_model(model_name: str = None) -> str:
         return DEFAULT_LLM_MODEL
     return LLM_MODELS.get(model_name, DEFAULT_LLM_MODEL)
 
+
 def list_available_models() -> list:
     """
     Return a list of all available LLM models.
@@ -51,6 +57,7 @@ def list_available_models() -> list:
         List of model names
     """
     return list(LLM_MODELS.values())
+
 
 
 def add_model(model_name: str, model_identifier: str = None):
@@ -66,6 +73,7 @@ def add_model(model_name: str, model_identifier: str = None):
     LLM_MODELS[model_name] = model_identifier
 
 
+
 def remove_model(model_name: str):
     """
     Remove a model from the available models list.
@@ -75,6 +83,7 @@ def remove_model(model_name: str):
     """
     if model_name in LLM_MODELS:
         del LLM_MODELS[model_name]
+
 
 
 def set_default_model(model_name: str):
