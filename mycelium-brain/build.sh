@@ -1,6 +1,6 @@
 #!/bin/bash
 # Mycelium Brain Fine-Tuning Build Script
-# This script builds the custom mycelium-brain:latest model for Mycelium OS
+# This script builds the branched custom models for Mycelium OS: public and personal.
 
 set -e
 
@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 echo "=========================================="
-echo "Mycelium Brain Fine-Tuning Build"
+echo "Mycelium Brain Branching Build"
 echo "=========================================="
 echo "Script Directory: $SCRIPT_DIR"
 echo "Project Directory: $PROJECT_DIR"
@@ -47,57 +47,63 @@ echo "[2/5] Creating build directory..."
 BUILD_DIR="$SCRIPT_DIR/build"
 mkdir -p "$BUILD_DIR"
 
-# Copy Modelfile
-echo "✓ Using Modelfile from $SCRIPT_DIR/Modelfile"
-
 # Check for training data
 TRAINING_FILE="$SCRIPT_DIR/training_data/mycelium_training.jsonl"
 if [ -f "$TRAINING_FILE" ]; then
     echo "✓ Training data found: $TRAINING_FILE"
 else
     echo "WARNING: No training data found at $TRAINING_FILE"
-    echo "Building without fine-tuning data (system prompt only)"
+    echo "Building personal brain without fine-tuning data (system prompt only)"
 fi
 
 echo ""
-echo "[3/5] Building mycelium-brain:latest..."
+echo "[3/5] Building branched models..."
 
-# Build the model
+# Build the models
 cd "$SCRIPT_DIR"
 
-# First, try to create the model with the Modelfile
-echo "Building with Ollama..."
-echo "Command: ollama create mycelium-brain:latest -f Modelfile"
-
-# Note: As of Ollama 0.30.4, the 'ollama create' command with Modelfile is the correct approach
-# However, for fine-tuning we need to use the appropriate command based on Ollama version
-
-# Check Ollama version for create command
-OLLAMA_VERSION=$(ollama --version | cut -d' ' -f3)
+# Ollama create command based on version
+OLLAMA_VERSION=$(ollama --version | awk '{print $NF}')
 echo "Ollama version: $OLLAMA_VERSION"
 
-# For Ollama 0.30.x, use 'ollama create'
-if [[ "$OLLAMA_VERSION" == 0.30.* ]]; then
-    echo "Using ollama create for version $OLLAMA_VERSION"
-    ollama create mycelium-brain:latest -f Modelfile
-else
-    echo "Using ollama build for version $OLLAMA_VERSION"
-    ollama build mycelium-brain:latest -f Modelfile
-fi
+# Define models to build
+MODELS_TO_BUILD=(
+    "mycelium-brain-public:latest"
+    "mycelium-brain-personal:latest"
+)
+
+# Define corresponding Modelfiles
+MODELFILES=(
+    "Modelfile.public"
+    "Modelfile.personal"
+)
+
+# Loop through and build each model
+for i in "${!MODELS_TO_BUILD[@]}"; do
+    MODEL_NAME="${MODELS_TO_BUILD[$i]}"
+    MODELFILE="${MODELFILES[$i]}"
+    
+    echo "Building $MODEL_NAME using $MODELFILE..."
+    
+    if [[ "$OLLAMA_VERSION" == 0.30.* ]]; then
+        ollama create "$MODEL_NAME" -f "$MODELFILE"
+    else
+        ollama build "$MODEL_NAME" -f "$MODELFILE"
+    fi
+done
 
 echo ""
-echo "[4/5] Verifying build..."
+echo "[4/5] Verifying builds..."
 
-# Check if model was created
-if ollama list | grep -q "mycelium-brain:latest"; then
-    echo "✓ mycelium-brain:latest successfully built!"
-    echo ""
-    echo "Model details:"
-    ollama show mycelium-brain:latest
-else
-    echo "ERROR: Model build may have failed. Checking logs..."
-    exit 1
-fi
+# Verify each model
+for MODEL_NAME in "${MODELS_TO_BUILD[@]}"; do
+    if ollama list | grep -q "$MODEL_NAME"; then
+        echo "✓ $MODEL_NAME successfully built!"
+    else
+        echo "ERROR: Model build for $MODEL_NAME may have failed."
+        exit 1
+    fi
+done
 
 echo ""
 echo "[5/5] Creating Docker image for distribution..."
@@ -105,12 +111,9 @@ echo "[5/5] Creating Docker image for distribution..."
 # Create Dockerfile for the model
 cat > "$BUILD_DIR/Dockerfile" << 'EOF'
 # Mycelium Brain Docker Image
-# Distributes the custom fine-tuned model
+# Distributes the custom branched models
 
 FROM ollama/ollama:latest
-
-# Copy the model file (will be built separately)
-# The model will be pulled at runtime or mounted as a volume
 
 # Set up entrypoint
 WORKDIR /app
@@ -130,13 +133,13 @@ set -e
 
 echo "Starting Mycelium Brain container..."
 
-# Pull the model if not already present
-if ! ollama list | grep -q "mycelium-brain:latest"; then
-    echo "Pulling mycelium-brain:latest..."
-    ollama pull mycelium-brain:latest
-else
-    echo "mycelium-brain:latest is already available"
-fi
+# Pull the models if not already present
+for model in mycelium-brain-public:latest mycelium-brain-personal:latest; do
+    if ! ollama list | grep -q "$model"; then
+        echo "Pulling $model..."
+        ollama pull "$model"
+    fi
+done
 
 # Start Ollama in the background
 ollama serve &
@@ -153,19 +156,20 @@ echo ""
 echo "=========================================="
 echo "Build Summary"
 echo "=========================================="
-echo "✓ Modelfile: $SCRIPT_DIR/Modelfile"
-echo "✓ Model: mycelium-brain:latest"
+echo "✓ Modelfiles: Modelfile.public, Modelfile.personal"
+echo "✓ Models: mycelium-brain-public:latest, mycelium-brain-personal:latest"
 echo "✓ Build directory: $BUILD_DIR"
 echo "✓ Dockerfile: $BUILD_DIR/Dockerfile"
 echo ""
-echo "To use the model:"
-echo "  ollama run mycelium-brain:latest"
+echo "To use the models:"
+echo "  ollama run mycelium-brain-public:latest"
+echo "  ollama run mycelium-brain-personal:latest"
 echo ""
 echo "To build Docker image:"
 echo "  cd $BUILD_DIR && docker build -t mycelium-brain:latest ."
 echo ""
 echo "To push to registry:"
 echo "  docker tag mycelium-brain:latest localhost:5000/mycelium/mycelium-brain:latest"
-echo "  docker push localhost:5000/mycelium/mycelium-brain:latest"
+echo "  docker push mycelium-brain:latest localhost:5000/mycelium/mycelium-brain:latest"
 echo ""
 echo "Build complete!"

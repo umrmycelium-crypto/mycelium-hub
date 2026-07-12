@@ -20,7 +20,7 @@ MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
 MISTRAL_API_KEY = None  # Will be loaded from MISTRAL_API_KEY environment variable
 
 # Default model to use when none is specified
-DEFAULT_LLM_MODEL = "llama3.1"
+DEFAULT_LLM_MODEL = "mycelium-brain-personal:latest"
 
 # Voice/TTS models
 VOICE_MODEL_PATH = "models/en_US-lessac-medium.onnx"

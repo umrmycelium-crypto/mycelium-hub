@@ -1,5 +1,6 @@
 from mycelium.core.agent_base import BaseAgent
 from mycelium.agents.creative_cores import MagnusCore, MilianaCore
+from mycelium.agents.executive_agent import executive_agent_personal, executive_agent_public
 from mycelium.runtime.media import media_play, media_search
 from mycelium.runtime.developer import developer_handler
 from mycelium.runtime.knowledge import knowledge_handler
@@ -19,6 +20,16 @@ class MyceliumAgent:
         return self.handler(task_input, {})
 
 AGENTS = {
+    "executive_agent": MyceliumAgent(
+        name="executive_agent",
+        capabilities=["system.exec", "system.file", "system.mesh"],
+        handler=lambda x: executive_agent_personal.run(x)
+    ),
+    "executive_agent_public": MyceliumAgent(
+        name="executive_agent_public",
+        capabilities=["system.exec", "system.file", "system.mesh"],
+        handler=lambda x: executive_agent_public.run(x)
+    ),
     "media_agent": MyceliumAgent(
         name="media_agent",
         capabilities=["media.play", "media.search", "media.agent"],
@@ -46,6 +57,3 @@ AGENTS = {
     "magnus_core": MagnusCore(),
     "miliana_core": MilianaCore(),
 }
-
-
-
