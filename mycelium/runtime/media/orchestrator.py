@@ -2,7 +2,8 @@ from mycelium.runtime.jellyfin import search_media, play_on_device
 from mycelium.runtime.jellyseerr import request_media
 
 
-def handle_media_play(title: str):
+def handle_media_play(payload, context):
+    title = payload.get("title", "")
     # 1. Try Jellyfin first
     item = search_media(title)
 

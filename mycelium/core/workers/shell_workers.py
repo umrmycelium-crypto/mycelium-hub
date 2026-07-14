@@ -67,14 +67,12 @@ def output_worker(event):
     if event.get("type") == INTENT_RESULT:
         payload = event.get("payload", {})
         result = payload.get("result")
-        print(f"
-{result}")
+        print(f"\n{result}")
         print("mshell> ", end="", flush=True)
     
     elif event.get("type") == SYSTEM_ERROR:
         msg = event.get("payload", {}).get("message", "Unknown Error")
-        print(f"
-❌ {msg}")
+        print(f"\n❌ {msg}")
         print("mshell> ", end="", flush=True)
 
 def bootstrap_shell_workers():

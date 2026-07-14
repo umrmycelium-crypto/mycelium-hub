@@ -13,8 +13,8 @@ from mycelium.core.speech_adaptor import SPEECH_ADAPTOR
 # --- Configuration ---
 from mycelium.core.models import VOICE_MODEL_PATH, VOICE_MODEL_CONFIG, WHISPER_MODEL_TYPE as WHISPER_MODEL_TYPE_CONFIG
 VOICE_SERVER_PORT = 7001
-MODEL_PATH = VOICE_MODEL_PATH
-CONFIG_PATH = VOICE_MODEL_CONFIG
+MODEL_PATH = "/home/mycelium/models/en_US-amy-medium.onnx"
+CONFIG_PATH = "/home/mycelium/models/en_US-amy-medium.onnx.json"
 WHISPER_MODEL_TYPE = WHISPER_MODEL_TYPE_CONFIG
 
 # --- TTS Controller (Handles Interruption) ---
@@ -45,7 +45,9 @@ class SpeechController:
     def _run_tts(self, text):
         try:
             print(f"🎙️ Generating speech for: {text}")
-            cmd = ["piper", "--model", MODEL_PATH, "--config", CONFIG_PATH, "--output_file", "speech_output.wav"]
+            # Use the absolute path to the piper binary
+            piper_bin = "/home/mycelium/piper/piper/piper"
+            cmd = [piper_bin, "--model", MODEL_PATH, "--config", CONFIG_PATH, "--output_file", "speech_output.wav"]
             process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             stdout, stderr = process.communicate(input=text)
             if process.returncode != 0:
@@ -58,7 +60,7 @@ class SpeechController:
             self.current_process = subprocess.Popen(play_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
             
             # We don't want to block the thread entirely with .wait() if we want to be able to stop it, 
-            # but the current logic uses .wait(). Let's keep it but capture the output on failure.
+            # but the current logic uses .communicate() which blocks.
             stdout, stderr = self.current_process.communicate()
             if self.current_process.returncode != 0 and self.current_process.returncode != -15: # -15 is SIGTERM (expected on stop())
                 print(f"❌ ffplay Error: {stderr}")
@@ -66,8 +68,8 @@ class SpeechController:
             print(f"TTS Exception: {e}")
 
 # Initialize Components
-print("Loading Whisper model...")
-whisper_model = whisper.load_model(WHISPER_MODEL_TYPE)
+print("Loading Whisper model on CPU...")
+whisper_model = whisper.load_model(WHISPER_MODEL_TYPE, device="cpu")
 speech_ctrl = SpeechController()
 
 # --- Voice Server for Proactive Speech ---

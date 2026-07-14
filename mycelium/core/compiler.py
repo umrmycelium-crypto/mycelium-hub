@@ -74,14 +74,14 @@ class IntentCompiler:
             }
 
         # -------------------------
-        # FALLBACK (MISS LOGGING)
+        # FALLBACK (AI-Driven)
         # -------------------------
         COMPILER_MEMORY.record_miss(input_str)
 
         return {
-            "name": "system.unknown",
+            "name": "ai.ask",
             "payload": {
-                "raw": input_str
+                "prompt": input_str
             },
             "context": {
                 "source": "mshell",
