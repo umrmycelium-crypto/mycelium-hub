@@ -1,0 +1,225 @@
+{
+  "main": {
+    "id": "8edfc330ac364d37",
+    "type": "split",
+    "children": [
+      {
+        "id": "8ea65cc553f4b669",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "090d25d7a1b8684b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "BOOK_PLAN.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "BOOK_PLAN"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "deda6f2358fb0b37",
+    "type": "split",
+    "children": [
+      {
+        "id": "70c065e877304095",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8f449ef6179cef15",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "8985ffa6968b9e47",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "f8fd39a70d80aca2",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "42cef9f836d704dd",
+    "type": "split",
+    "children": [
+      {
+        "id": "fb5dff5c571d6623",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ac780b103fb8b4f7",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "BOOK_PLAN.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for BOOK_PLAN"
+            }
+          },
+          {
+            "id": "2dbee3274ebb6133",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "BOOK_PLAN.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from BOOK_PLAN"
+            }
+          },
+          {
+            "id": "fcbdb386fa29e59e",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "8743e7e967e9b87f",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "5ca9c443fe9cef5a",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "BOOK_PLAN.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of BOOK_PLAN"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "090d25d7a1b8684b",
+  "lastOpenFiles": [
+    "mycelium/tools/system_tool.py",
+    "SOVEREIGN_CIRCLE.md",
+    "mycelium/tools/knowledge_tool.py",
+    "mycelium/core/workers/__pycache__/sentinel_worker.cpython-312.pyc",
+    "mycelium/core/workers/sentinel_worker.py",
+    "README.md",
+    "QUICK_START.md",
+    "INVESTOR_DECK_SOVEREIGN.md",
+    "INVESTOR_DECK.md",
+    "GRANT_TARGETS.md",
+    "GEMINI.md",
+    "FIXES_APPLIED.md",
+    "DREAM_INVITATION.md",
+    "DIGITAL_SORT.md",
+    "DATA_SORT_PLAN.md",
+    "DAILY_RHYTHM.md",
+    "CONSULTING_MENU.md",
+    "BOOK_PLAN.md",
+    "caddy/Caddyfile",
+    "caddy",
+    "mycelium-hub/SOVEREIGN_DIY_GUIDE.md",
+    "bootstrap.md",
+    "INVENTORY.md",
+    "mycelium-hub/BETA_TESTER_GUIDE.md",
+    "mycelium-brain/BUILD_SUMMARY.md",
+    "docs/ARCHITECTURE.md",
+    "mycelium-hub/SOVEREIGN_FINANCIAL_PLAN.md",
+    "mycelium-hub/SOVEREIGN_TOOLING.md",
+    "mycelium-hub/Sovereign_Environment.md",
+    "mycelium-hub/OBSIDIAN_LIBRARY_INDEX.md",
+    "venv_voice/lib/python3.12/site-packages/pip/_internal/metadata/importlib/__pycache__/_envs.cpython-312.pyc",
+    "venv_voice/lib/python3.12/site-packages/pip/_internal/metadata/importlib/__pycache__/_dists.cpython-312.pyc",
+    "venv_voice/lib/python3.12/site-packages/pip/_internal/metadata/importlib/__pycache__/_compat.cpython-312.pyc",
+    "venv_voice/lib/python3.12/site-packages/pip/_internal/metadata/importlib/__pycache__/__init__.cpython-312.pyc",
+    "venv_voice/lib/python3.12/site-packages/pip/_internal/metadata/importlib/__pycache__",
+    "venv_voice/lib/python3.12/site-packages/pip-26.1.2.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md"
+  ]
+}

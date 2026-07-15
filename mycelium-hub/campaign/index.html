@@ -1,190 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>Mycelium Mind: Campaign Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mycelium Mind | The Production Node</title>
   <style>
+    :root {
+      --bg-deep: #0a0b10;
+      --bg-surface: #161821;
+      --accent-primary: #7c4dff;
+      --accent-secondary: #b388ff;
+      --text-main: #e0e0e0;
+      --text-muted: #a0a0a0;
+      --gradient-sovereign: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 1200px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
       margin: 0 auto;
-      padding: 40px 20px;
-      background: #f5f7fa;
-      color: #333;
+      padding: 0 20px;
     }
+
+    /* Hero Section */
     header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 60px 20px;
-      text-align: center;
-      border-radius: 10px;
-      margin-bottom: 30px;
-    }
-    h1 { margin: 0; font-size: 2.5em; }
-    .subtitle { font-size: 1.2em; opacity: 0.9; margin-top: 10px; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin: 30px 0;
-    }
-    .stat-card {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 100px 0 60px;
       text-align: center;
     }
-    .stat-value {
-      font-size: 2.5em;
+    h1 {
+      font-size: 3.5rem;
+      margin: 0;
+      background: var(--gradient-sovereign);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+    .hero-subtitle {
+      font-size: 1.4rem;
+      color: var(--text-muted);
+      margin-top: 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* The Journey Section */
+    .journey {
+      background: var(--bg-surface);
+      padding: 60px 40px;
+      border-radius: 24px;
+      margin-bottom: 60px;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .journey h2 {
+      color: var(--accent-secondary);
+      font-size: 2rem;
+      margin-top: 0;
+      text-align: center;
+    }
+    .journey p {
+      font-size: 1.1rem;
+      color: var(--text-main);
+      margin-bottom: 20px;
+    }
+    .journey .date {
       font-weight: bold;
-      color: #667eea;
-      margin: 10px 0;
-    }
-    .stat-label {
-      color: #666;
-      font-size: 0.9em;
+      color: var(--accent-primary);
+      display: block;
+      margin-bottom: 5px;
       text-transform: uppercase;
+      font-size: 0.9rem;
       letter-spacing: 1px;
     }
-    .timeline {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      margin: 30px 0;
+
+    /* Milestone Section */
+    .milestone-box {
+      text-align: center;
+      margin-bottom: 80px;
     }
-    .timeline h2 { margin-top: 0; color: #667eea; }
-    .timeline-item {
-      padding: 15px 0;
-      border-left: 3px solid #667eea;
-      padding-left: 20px;
-      margin-left: 10px;
+    .milestone-title {
+      font-size: 2rem;
+      margin-bottom: 10px;
     }
-    .timeline-item:last-child { border-left: none; }
-    .next-steps {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    .milestone-desc {
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      background: rgba(255,255,255,0.05);
+      border-radius: 50px;
+      height: 24px;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto 20px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .progress-fill {
+      background: var(--gradient-sovereign);
+      width: 0%;
+      height: 100%;
+      transition: width 1s ease-out;
+      box-shadow: 0 0 20px rgba(124, 77, 255, 0.5);
+    }
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: bold;
+      color: var(--accent-secondary);
+    }
+
+    /* The "First Domino" Card */
+    .domino-card {
+      background: linear-gradient(145deg, #1e202d, #161821);
+      border: 1px solid var(--accent-primary);
+      padding: 40px;
+      border-radius: 24px;
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .domino-card h3 {
+      font-size: 1.8rem;
+      margin-top: 0;
+    }
+    .domino-card p {
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+
+    /* Donate Button */
+    .donate-btn {
+      background: var(--gradient-sovereign);
       color: white;
-      padding: 30px;
-      border-radius: 10px;
-      margin: 30px 0;
+      padding: 20px 50px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      border-radius: 50px;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
     }
-    .next-steps h2 { margin-top: 0; }
+    .donate-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(118, 75, 162, 0.5);
+    }
+
     footer {
       text-align: center;
-      padding: 40px 20px;
-      color: #666;
-      font-size: 0.9em;
-    }
-    .approve-btn {
-      background: #667eea;
-      color: white;
-      border: none;
-      padding: 15px 40px;
-      font-size: 1.1em;
-      border-radius: 50px;
-      cursor: pointer;
-      margin: 20px 0;
-      display: inline-block;
-      text-decoration: none;
-    }
-    .approve-btn:hover {
-      background: #764ba2;
-      transform: translateY(-2px);
+      padding: 60px 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Mycelium Mind Campaign</h1>
-    <p class="subtitle">Building a Self-Evolving Cognitive Future</p>
-  </header>
+  <div class="container">
+    <header>
+      <h1>Mycelium Mind: <br>The Production Node</h1>
+      <p class="hero-subtitle">From the chaos of the physical to the clarity of the cognitive. Help us build the first domino of sovereignty.</p>
+    </header>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Target Goal</div>
-      <div class="stat-value">$15,000</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Backers</div>
-      <div class="stat-value" id="backers">0</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Raised</div>
-      <div class="stat-value" id="raised">$0</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Days Left</div>
-      <div class="stat-value">30</div>
-    </div>
+    <section class="journey">
+      <h2>The Path from Chaos to Clarity</h2>
+      <p>
+        <span class="date">January 2, 2026</span>
+        It began with a hoarding house. A space overwhelmed by physical weight, where every object was a fragment of a story, but the overall narrative was lost in the noise. I stepped into that chaos not just to clean a room, but to understand how we lose ourselves in our own complexity.
+      </p>
+      <p>
+        What started as a cleanup evolved into a quest for <strong>Cognitive Sovereignty</strong>. I began building the Mycelium Mind—a digital architecture designed to map "idea-fields" and allow intent to emerge naturally from complexity rather than forcing it.
+      </p>
+      <p>
+        For months, I have worked to organize the digital mind. But true sovereignty cannot exist in a vacuum. To be fully independent, the mind must have a hand. The digital architecture must have a physical counterpart.
+      </p>
+    </section>
+
+    <section class="milestone-box">
+      <h2 class="milestone-title">The First Domino</h2>
+      <p class="milestone-desc">To bridge the gap between thought and thing, we need a <strong>Production Node</strong>.</p>
+      
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+      <div class="stats-row">
+        <span id="raised-text">$0 Raised</span>
+        <span>Goal: $1,500</span>
+      </div>
+    </section>
+
+    <section class="domino-card">
+      <h3>The Modular 3D Printer</h3>
+      <p>
+        We aren't buying a hobbyist toy. We are acquiring a professional-grade Voron system capable of printing engineering-grade materials. This printer allows us to fabricate the tools, jigs, and hardware for our larger goal: A Sovereign Lab featuring renewable energy and closed-loop bio-waste systems.
+      </p>
+      <a href="https://paypal.me/MTrepke" class="donate-btn" target="_blank">💰 FUND THE NODE</a>
+    </section>
+
+    <footer>
+      <p>Mycelium Mind | A Journey in Sovereignty</p>
+      <p>© 2026 | Built on the Forged Intent Node</p>
+    </footer>
   </div>
-
-  <div class="timeline">
-    <h2>📅 Campaign Timeline</h2>
-    <div class="timeline-item">
-      <strong>Hour 0-1:</strong> Campaign creation & setup
-    </div>
-    <div class="timeline-item">
-      <strong>Hour 1-2:</strong> Review & approval phase
-    </div>
-    <div class="timeline-item">
-      <strong>Hour 2-3:</strong> Launch & initial promotion
-    </div>
-    <div class="timeline-item">
-      <strong>Day 1:</strong> Personal network outreach
-    </div>
-    <div class="timeline-item">
-      <strong>Day 3:</strong> First stretch goal announced
-    </div>
-    <div class="timeline-item">
-      <strong>Day 7:</strong> Press outreach begins
-    </div>
-    <div class="timeline-item">
-      <strong>Day 30:</strong> Campaign concludes
-    </div>
-  </div>
-
-  <div class="next-steps">
-    <h2>⚡ Next Steps</h2>
-    <p><strong>1. Review Campaign Materials</strong> - Check all copy, rewards, and allocations below</p>
-    <p><strong>2. Approve & Launch</strong> - Click the button to go live</p>
-    <p><strong>3. Share with Network</strong> - I'll provide shareable links</p>
-    <p><strong>4. Monitor Progress</strong> - This dashboard updates in real-time</p>
-    
-    <a href="#approve" class="approve-btn" onclick="approveCampaign()">🚀 APPROVE & LAUNCH CAMPAIGN</a>
-  </div>
-
-  <footer>
-    <p>Mycelium Mind Campaign Dashboard | Managed by Venice | Last updated: <span id="timestamp">Just now</span></p>
-    <p><a href="/dashboard/" style="color: #667eea;">← Back to Mycelium Dashboard</a></p>
-  </footer>
 
   <script>
-    // Update timestamp
-    function updateTime() {
-      document.getElementById('timestamp').textContent = new Date().toLocaleString();
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+    // Mock values for demonstration - can be replaced with real API calls
+    const GOAL = 1500;
+    const RAISED = 450; // Change this value to update progress
 
-    // Mock data for now - will connect to real campaign when live
-    function updateStats() {
-      // These will be real values when campaign is live
-      // For now, showing placeholder
+    function updateProgress() {
+      const percent = (RAISED / GOAL) * 100;
+      document.getElementById('progress-bar').style.width = percent + '%';
+      document.getElementById('raised-text').textContent = '$' + RAISED + ' Raised';
     }
-    
-    function approveCampaign() {
-      alert('Campaign approved! Launching now...');
-      // In reality, this would trigger the actual launch
-      document.getElementById('backers').textContent = '0';
-      document.getElementById('raised').textContent = '$0';
-    }
-    
-    // Simulate some activity for demo
-    setTimeout(() => {
-      document.getElementById('backers').textContent = '3';
-      document.getElementById('raised').textContent = '$450';
-    }, 5000);
+
+    window.onload = updateProgress;
   </script>
 </body>
 </html>

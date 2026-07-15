@@ -1,0 +1,7 @@
+:80 {
+    root * /var/www/campaign
+    file_server
+    
+    # Route /node to the campaign index
+    rewrite /node /index.html
+}

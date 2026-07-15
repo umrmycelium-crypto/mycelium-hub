@@ -28,7 +28,7 @@ $PYTHON_BIN -c "from mycelium.agents.executive_agent import executive_agent_pers
 # We start the bootstrap process for all workers.
 
 echo "Bootstrapping Mycelium Core Workers..."
-$PYTHON_BIN -c "from mycelium.core.workers.shell_workers import bootstrap_shell_workers; from mycelium.core.workers.sensor_workers import bootstrap_sensor_workers; bootstrap_shell_workers(); bootstrap_sensor_workers()"
+$PYTHON_BIN -c "from mycelium.core.workers.shell_workers import bootstrap_shell_workers; from mycelium.core.workers.sensor_workers import bootstrap_sensor_workers; from mycelium.core.workers.sentinel_worker import bootstrap_sentinel_workers; bootstrap_shell_workers(); bootstrap_sensor_workers(); bootstrap_sentinel_workers()"
 
 echo "Starting Voice Sensing Loop..."
 $PYTHON_BIN voice.py &
