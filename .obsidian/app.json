@@ -1,1 +1,8 @@
-{}
+{
+  "showUnsupportedFiles": false,
+  "alwaysUpdateLinks": true,
+  "attachmentFolderPath": "./Attachments",
+  "newFileLocation": "current",
+  "openBehavior": "file:DAILY_RHYTHM",
+  "uriCallbacks": true
+}
