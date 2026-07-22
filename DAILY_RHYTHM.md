@@ -8,7 +8,7 @@
 ightarrow$ Wash face.
 - [ ] **The Biological Reset:** Glass of water $
 ightarrow$ Fuel/Meal.
-- [ ] **The Cognitive Reset:** Tell the Executive Agent: *"Today the priority is [X]."*
+- [ ] **The Cognitive Reset:** Tell the Executive Agent: *"Today the priority is [Health habits: Eating]."*
 
 ### ☀️ ANCHOR 2: MIDDAY (The Calibration)
 - [ ] **The Sensory Reset:** 5 minutes of movement or fresh air.

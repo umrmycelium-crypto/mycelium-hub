@@ -4,12 +4,13 @@ This document serves as the authoritative record of all hardware and network ass
 
 ## 🖥️ Compute Nodes
 
-| Node Name | IP Address | Role | Key Assets / Software |
-| :--- | :--- | :--- | :--- |
+| Node Name         | IP Address   | Role                         | Key Assets / Software                     |
+| :---------------- | :----------- | :--------------------------- | :---------------------------------------- |
 | **Forged Intent** | `10.0.0.221` | Primary Development / Kernel | Mycelium Hub, API, Dashboard, Media Stack |
-| **VeinWeave** | `10.0.0.166` | Infrastructure / DevOps | Docker files, Containerized services |
-| **The Studio** | `10.0.0.72` | Creative / Development | Xcode, iOS/macOS Dev Tools |
-| **Renewal Core** | TBD | High-Performance Compute | "Powewredge" - Core Processing |
+| **VeinWeave**     | `10.0.0.166` | Infrastructure / DevOps      | Docker files, Containerized services      |
+| **The Studio**    | `10.0.0.72`  | Creative / Development       | Xcode, iOS/macOS Dev Tools                |
+| **Renewal Core**  | `10.0.0.10`  | High-Performance Compute     | "Powewredge" - Core Processing            |
+| **Ghost Talk**    | `10.0.0.126` | Connection / Communication   | iOS/App Dev Tools                         |
 
 ## 🌐 Network Infrastructure
 - **Tailscale:** Used for secure, encrypted mesh networking across all nodes.

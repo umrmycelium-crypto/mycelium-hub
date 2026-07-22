@@ -33,10 +33,10 @@ Transform a collection of fragmented backups and user profiles into a "well-clea
 
 ## 📈 Discovery Progress
 
-- [x] Map `Veinweave` depth and contents.
-- [x] Map `Users/arche` depth and contents.
-- [x] Analyze `iCloud` and `Migration_Backup` on `forge-ext`.
-- [x] Identify and isolate "The Studio" assets.
+- [ ] Map `Veinweave` depth and contents.
+- [ ] Map `Users/arche` depth and contents.
+- [ ] Analyze `iCloud` and `Migration_Backup` on `forge-ext`.
+- [ ] Identify and isolate "The Studio" assets.
 
 ## 🚚 Extraction Progress
 - [ ] Migrate `Project Genesis` and `EverMemOS` to Vault.
