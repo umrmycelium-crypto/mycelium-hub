@@ -2,20 +2,22 @@
 
 ## Operational
 
-### Gemini CLI
-Status: Working
+### Gemini CLI / Antigravity Agent
+Status: Active & Integrated
 Authentication: Completed
-Purpose: Repository analysis, Documentation, Coding assistance, Architecture review
+Purpose: Repository analysis, Documentation, Codebase evolution, Architecture review
 
 ### Ollama
-Status: Installed
+Status: Installed & Operational
 Purpose: Local AI execution, Privacy-preserving inference, Intent routing
 
-### Whisper Voice Prototype
-Status: Working
-Capabilities: Speech-to-text
-Observed Behavior: Successfully transcribed "Hello! It's me, Markus!"
-Current Limitation: Persona responses require refinement.
+### Mycelium OS Kernel & Event Bus (`NervousBus`)
+Status: Implemented & Operational
+Capabilities: Proactive event handling, Cognitive state management, ReAct agent loop
+
+### Executive Agent v1 & Voice Pipeline
+Status: Operational
+Capabilities: Integrated voice sensing (Whisper), rich CLI UI, semantic memory synthesis
 
 ### Media Automation (Phase 2)
 Status: Orchestrated
@@ -29,18 +31,18 @@ Capabilities:
 Status: Connected to local network
 
 ### Jellyfin
-Status: Reachable on local network
-TV connectivity: Successful
+Status: Reachable on local network (Port 8096)
 
 ### Obsidian
 Status: Installed
-Purpose: Knowledge vault
+Purpose: Knowledge vault & long-term memory store
 
 ### ARR Stack (Radarr, Sonarr, Jellyseerr, qBittorrent)
 Status: Operational
 Purpose: Media acquisition and management
 
 ## Active Focus
-- **Phase 3: Intent Engine**
-  - Transitioning from primitive API wrappers to a natural language interface.
-  - Implementing intent parsing and tool routing.
+- **Phase 6: The Mycelium Mesh**
+  - Developing Universal Synapse for cross-platform event distribution.
+  - Building Mesh Registry for real-time node topography mapping.
+  - Expanding local cognitive nodes and Sovereign Presence.
