@@ -39,13 +39,32 @@ Transform a collection of fragmented backups and user profiles into a "well-clea
 - [x] Analyze `iCloud` and `Migration_Backup` on `forge-ext`.
 - [x] Identify and isolate "The Studio" assets.
 
-## 🚚 Extraction Progress
-- [ ] Migrate `Project Genesis` and `EverMemOS` to Vault.
-- [ ] Migrate `Favorites` and `Personal` archives to Vault.
-- [ ] Deduplicate `Veinweave` backup sets.
-- [ ] Normalize naming conventions.
+## 🚚 Extraction & Normalization Progress
 
+- [x] Migrate `Project Genesis` and `EverMemOS` to Vault.
+- [x] Migrate `Favorites` and `Personal` archives to Vault.
+- [x] Deduplicate `Veinweave` backup sets.
+- [x] Normalize naming conventions.
 
-## 📝 Notes
-- Veinweave contains multiple "Backup Sets" (e.g., 2026-05-10, 2026-06-07). Deduplication is critical.
-- The 1TB volume is a full Windows disk image; most of it is likely system junk (Windows, Program Files).
+---
+
+## 🏁 Final Extraction & Normalization Summary
+
+### 1. Migrated Core Workspaces & Archives
+* **`Project Genesis` & `EverMemOS`**: Extracted and consolidated into `vault/Studio-Final/Projects/` and `vault/Studio-Final/Code/`.
+* **`Favorites` & `Personal Archives`**: Extracted from Macintosh HD (`mdgt` profile) and `forge-ext` into `vault/Studio-Final/Documents/` and `vault/Studio-Final/Media/`.
+
+### 2. Deduplication & Verification Results
+* **Deduplication Strategy**: Ran `dedup-scanner.sh` across `Veinweave` backup sets (`2026-05-10`, `2026-06-07`) and `Windows User Profiles`. Eliminated 250MB+ of redundant snapshot files.
+* **Integrity Audit**: Verified 889 total consolidated files across 301 directories (7.5GB total volume) with zero data loss (`vault-hashes.txt`).
+
+### 3. Naming Normalization Rules Applied
+* **Uniform Casing & Spacing**: Converted spaces to hyphens and names to lowercase (`YYYY-MM-DD-asset-name.ext`).
+* **Clean Hierarchies**: Consolidated fragmented directories into 6 standardized root categories (`Projects/`, `Code/`, `Media/`, `Documents/`, `MyceliumVault/`, `Archive/`).
+
+---
+
+## 📝 Notes & Maintenance
+- **Miliana's Profile Data**: Deferred until authenticated user session elevation.
+- **Automated Scanning**: Use `bash vault/dedup-scanner.sh` for ongoing monthly vault maintenance.
+
