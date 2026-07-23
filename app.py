@@ -1,10 +1,6 @@
 from flask import Flask, jsonify, request, send_file
 import requests
-from mycelium.core.intent_engine import engine as intent_engine
-from mycelium.core.kernel import kernel
-from mycelium.core.nervous_bus import nervous_bus, SystemEvent
-from mycelium.core.onboarding import onboarding_manager
-import os
+from mycelium.router import dispatch_intent
 
 app = Flask(__name__)
 

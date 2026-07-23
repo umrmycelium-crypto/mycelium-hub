@@ -1,0 +1,689 @@
+version: '3.9'
+
+# ════════════════════════════════════════════════════════════════════════════
+# 🧠 UNIFIED MYCELIUM ECOSYSTEM DOCKER STACK
+# ════════════════════════════════════════════════════════════════════════════
+# Integrated Architecture:
+# - Mycelium Hub (Intent-driven core + LLM)
+# - Forged Intent (Rule Engine + Vision Pipeline)
+# - Production Memory (Vector DB + Document Storage + Search)
+# - Studio Stack (CMS + Database)
+# - Media Services (Jellyfin, Radarr, Sonarr, etc.)
+# ════════════════════════════════════════════════════════════════════════════
+
+services:
+  # ══════════════════════════════════════════════════════════════════════════
+  # 🧠 MYCELIUM HUB - Intent-Driven Core + LLM Backend
+  # ══════════════════════════════════════════════════════════════════════════
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mycelium-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_NUM_GPU: 0  # Set to 1 if GPU available
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mycelium-net
+
+  mycelium-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mycelium-hub-core
+    ports:
+      - "8000:8000"       # API/Daemon (dashboard backend)
+      - "8082:8082"       # Dashboard UI
+      - "7001:7001"       # Speech service
+    environment:
+      # LLM Configuration
+      MYCELIUM_OLLAMA_MODEL: qwen2.5-coder:latest
+      OLLAMA_URL: http://ollama:11434
+      
+      # Forged Intent (Rule Engine)
+      RULE_ENGINE_URL: http://rule-engine:8080
+      
+      # Production Memory (Vector + Search)
+      MILVUS_URL: http://milvus-standalone:19530
+      ELASTICSEARCH_URL: http://memsys-elasticsearch:9200
+      MONGODB_URL: mongodb://mongo_admin:${MONGODB_PASSWORD:-mongopass_change_me}@memsys-mongodb:27017
+      REDIS_URL: redis://redis-central:6379
+      
+      # MCP Servers
+      GATEWAY_URL: http://the-gateway:3004
+      FORGE_URL: http://the-forge:3002
+      SCRIBE_URL: http://spore-scribe:3001
+      
+      # Media Services
+      JELLYFIN_URL: http://jellyfin:8096
+      RADARR_URL: http://radarr:7878
+      SONARR_URL: http://sonarr:8989
+      JELLYSEERR_URL: http://jellyseerr:5055
+      QBITTORRENT_URL: http://qbittorrent:8080
+      
+      # Dashboard Config
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: 8082
+      DAEMON_HOST: 0.0.0.0
+      DAEMON_PORT: 8000
+    volumes:
+      - ./state:/app/state
+      - ./mycelium/logs:/app/mycelium/logs
+      - ./mycelium/memory:/app/mycelium/memory
+    depends_on:
+      ollama:
+        condition: service_healthy
+      postgres-central:
+        condition: service_healthy
+      redis-central:
+        condition: service_healthy
+      milvus-standalone:
+        condition: service_healthy
+      memsys-elasticsearch:
+        condition: service_healthy
+      memsys-mongodb:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mycelium-net
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 🎯 FORGED INTENT - Rule Engine + Vision Pipeline
+  # ══════════════════════════════════════════════════════════════════════════
+
+  postgres-forged:
+    image: postgres:16-alpine
+    container_name: forged-intent-postgres
+    environment:
+      POSTGRES_USER: pgadmin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pgpass_change_me}
+      POSTGRES_DB: visiondb
+    ports:
+      - "5432:5432"
+    volumes:
+      - forged_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pgadmin -d visiondb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  redis-forged:
+    image: redis:7.4-alpine
+    container_name: forged-intent-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - forged_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  rule-engine:
+    build:
+      context: ./services/rule_engine
+      dockerfile: Dockerfile
+    container_name: my-app-rule-engine
+    environment:
+      POSTGRES_CONN: "postgresql://pgadmin:${POSTGRES_PASSWORD:-pgpass_change_me}@postgres-forged:5432/visiondb"
+      REDIS_HOST: "redis-forged"
+      REDIS_PORT: "6379"
+      RULE_ENGINE_PORT: "8080"
+      LOG_LEVEL: "INFO"
+    depends_on:
+      postgres-forged:
+        condition: service_healthy
+      redis-forged:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mycelium-net
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 🏛️ CENTRAL DATA LAYER
+  # ══════════════════════════════════════════════════════════════════════════
+
+  postgres-central:
+    image: postgres:16-alpine
+    container_name: postgres-central
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_CENTRAL_PASSWORD:-centralpgpass_change_me}
+      POSTGRES_DB: mycelium
+    volumes:
+      - postgres_central_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  redis-central:
+    image: redis:7.4-alpine
+    container_name: redis-central
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_central_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 🔍 SEARCH & VECTOR LAYER
+  # ══════════════════════════════════════════════════════════════════════════
+
+  milvus-minio:
+    image: minio/minio:RELEASE.2024-01-31T20-24-33Z
+    container_name: milvus-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minioadmin_change_me}
+    volumes:
+      - milvus_minio_data:/minio_data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: minio server /minio_data --console-address ":9001"
+    networks:
+      - mycelium-net
+
+  milvus-etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: milvus-etcd
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    volumes:
+      - milvus_etcd_data:/etcd
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    restart: unless-stopped
+    command: etcd -advertise-client-urls http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    networks:
+      - mycelium-net
+
+  milvus-standalone:
+    image: milvusdb/milvus:v2.5.2
+    container_name: milvus-standalone
+    depends_on:
+      - milvus-minio
+      - milvus-etcd
+    environment:
+      COMMON_STORAGETYPE: minio
+      MINIO_ADDRESS: milvus-minio:9000
+      MINIO_ACCESS_KEYID: minioadmin
+      MINIO_SECRET_ACCESSKEY: ${MINIO_PASSWORD:-minioadmin_change_me}
+      ETCD_ENDPOINTS: milvus-etcd:2379
+      ETCD_USE_EMBED: "false"
+    volumes:
+      - milvus_data:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mycelium-net
+
+  memsys-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: memsys-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 | grep -q cluster_name"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  memsys-mongodb:
+    image: mongo:8.0
+    container_name: memsys-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo_admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-mongopass_change_me}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 🌐 MCP SERVERS - Knowledge Integration
+  # ══════════════════════════════════════════════════════════════════════════
+
+  the-gateway:
+    build:
+      context: ./mcpServers/the-gateway
+      dockerfile: Dockerfile
+    container_name: mcp-the-gateway
+    environment:
+      NODE_ENV: production
+      MILVUS_URL: http://milvus-standalone:19530
+      MONGODB_URL: mongodb://mongo_admin:${MONGODB_PASSWORD:-mongopass_change_me}@memsys-mongodb:27017
+      ELASTICSEARCH_URL: http://memsys-elasticsearch:9200
+      REDIS_URL: redis://redis-central:6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: "3004"
+    depends_on:
+      milvus-standalone:
+        condition: service_healthy
+      memsys-mongodb:
+        condition: service_healthy
+      memsys-elasticsearch:
+        condition: service_healthy
+      redis-central:
+        condition: service_healthy
+    ports:
+      - "3004:3004"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mycelium-net
+
+  the-forge:
+    build:
+      context: ./mcpServers/the-forge
+      dockerfile: Dockerfile
+    container_name: mcp-the-forge
+    environment:
+      NODE_ENV: production
+      MILVUS_URL: http://milvus-standalone:19530
+      MONGODB_URL: mongodb://mongo_admin:${MONGODB_PASSWORD:-mongopass_change_me}@memsys-mongodb:27017
+      ELASTICSEARCH_URL: http://memsys-elasticsearch:9200
+      REDIS_URL: redis://redis-central:6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: "3002"
+    depends_on:
+      milvus-standalone:
+        condition: service_healthy
+      memsys-mongodb:
+        condition: service_healthy
+      memsys-elasticsearch:
+        condition: service_healthy
+      redis-central:
+        condition: service_healthy
+    ports:
+      - "3002:3002"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mycelium-net
+
+  spore-scribe:
+    build:
+      context: ./mcpServers/spore-scribe
+      dockerfile: Dockerfile
+    container_name: mcp-spore-scribe
+    environment:
+      NODE_ENV: production
+      MILVUS_URL: http://milvus-standalone:19530
+      MONGODB_URL: mongodb://mongo_admin:${MONGODB_PASSWORD:-mongopass_change_me}@memsys-mongodb:27017
+      ELASTICSEARCH_URL: http://memsys-elasticsearch:9200
+      REDIS_URL: redis://redis-central:6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: "3001"
+    depends_on:
+      milvus-standalone:
+        condition: service_healthy
+      memsys-mongodb:
+        condition: service_healthy
+      memsys-elasticsearch:
+        condition: service_healthy
+      redis-central:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mycelium-net
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 📰 CMS & CONTENT LAYER
+  # ══════════════════════════════════════════════════════════════════════════
+
+  wordpress-db:
+    image: mysql:8.0
+    container_name: wordpress-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${WORDPRESS_DB_ROOT_PASSWORD:-wordpress_root_change_me}
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wordpress_pass_change_me}
+    volumes:
+      - wordpress_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  wordpress:
+    image: wordpress:6.4-apache
+    container_name: wordpress
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wordpress_pass_change_me}
+    depends_on:
+      wordpress-db:
+        condition: service_healthy
+    ports:
+      - "8081:80"
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  baserow:
+    image: baserow/baserow:latest
+    container_name: baserow
+    environment:
+      DATABASE_URL: postgresql://admin:${POSTGRES_CENTRAL_PASSWORD:-centralpgpass_change_me}@postgres-central:5432/baserow
+      REDIS_URL: redis://redis-central:6379
+    depends_on:
+      postgres-central:
+        condition: service_healthy
+      redis-central:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    volumes:
+      - baserow_data:/baserow/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 📺 MEDIA SERVICES STACK
+  # ══════════════════════════════════════════════════════════════════════════
+
+  jellyfin:
+    image: nyanmisaka/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
+      - "8920:8920"
+      - "1900:1900/udp"
+      - "7359:7359/udp"
+    environment:
+      JELLYFIN_DATA_DIR: /config
+      JELLYFIN_CACHE_DIR: /cache
+      JELLYFIN_LOG_DIR: /config/logs
+    volumes:
+      - jellyfin_config:/config
+      - jellyfin_cache:/cache
+      - /mnt/media:/media:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mycelium-net
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    ports:
+      - "7878:7878"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: UTC
+      UMASK: "022"
+    volumes:
+      - radarr_config:/config
+      - /mnt/media/movies:/movies
+      - /mnt/downloads:/downloads
+    depends_on:
+      - qbittorrent
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7878/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mycelium-net
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    ports:
+      - "8989:8989"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: UTC
+      UMASK: "022"
+    volumes:
+      - sonarr_config:/config
+      - /mnt/media/tv:/tv
+      - /mnt/downloads:/downloads
+    depends_on:
+      - qbittorrent
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mycelium-net
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    ports:
+      - "5055:5055"
+    environment:
+      LOG_LEVEL: debug
+      TZ: UTC
+    volumes:
+      - jellyseerr_config:/app/config
+    depends_on:
+      - jellyfin
+      - radarr
+      - sonarr
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5055/api/v1/settings/main"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mycelium-net
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    ports:
+      - "6881:6881"
+      - "6881:6881/udp"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: UTC
+      UMASK: "022"
+      WEBUI_PORT: "8080"
+    volumes:
+      - qbittorrent_config:/config
+      - /mnt/downloads:/downloads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mycelium-net
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # 🔧 UTILITIES
+  # ══════════════════════════════════════════════════════════════════════════
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_REMOVE_VOLUMES: "true"
+      WATCHTOWER_SCHEDULE: "0 0 4 * * *"
+    restart: unless-stopped
+    networks:
+      - mycelium-net
+
+# ════════════════════════════════════════════════════════════════════════════
+# VOLUMES
+# ════════════════════════════════════════════════════════════════════════════
+
+volumes:
+  # Mycelium
+  ollama_data:
+  
+  # Forged Intent
+  forged_pgdata:
+  forged_redis_data:
+  
+  # Central Data
+  postgres_central_data:
+  redis_central_data:
+  
+  # Vector & Search
+  milvus_minio_data:
+  milvus_etcd_data:
+  milvus_data:
+  elasticsearch_data:
+  mongodb_data:
+  
+  # CMS
+  wordpress_db_data:
+  wordpress_data:
+  baserow_data:
+  
+  # Media
+  jellyfin_config:
+  jellyfin_cache:
+  radarr_config:
+  sonarr_config:
+  jellyseerr_config:
+  qbittorrent_config:
+
+# ════════════════════════════════════════════════════════════════════════════
+# NETWORKS
+# ════════════════════════════════════════════════════════════════════════════
+
+networks:
+  mycelium-net:
+    name: mycelium-net
+    driver: bridge

@@ -30,13 +30,14 @@ Transform a collection of fragmented backups and user profiles into a "well-clea
 | :--- | :--- | :--- | :--- |
 | **forge-ext** | `/run/media/mycelium/forge-ext` | ~932G | Veinweave, iCloud, Migration Backups |
 | **1000 GB Volume** | `/run/media/mycelium/A876062C7605FBB6` | ~931G | Windows User Profiles (`arche`), Program Files |
+| **Macintosh HD (The Studio)** | `/` | 189G total (12G used, 3.1G free—80% capacity) | User profiles (Miliana, mdgt), Applications, System |
 
 ## 📈 Discovery Progress
 
-- [ ] Map `Veinweave` depth and contents.
-- [ ] Map `Users/arche` depth and contents.
-- [ ] Analyze `iCloud` and `Migration_Backup` on `forge-ext`.
-- [ ] Identify and isolate "The Studio" assets.
+- [x] Map `Veinweave` depth and contents.
+- [x] Map `Users/arche` depth and contents.
+- [x] Analyze `iCloud` and `Migration_Backup` on `forge-ext`.
+- [x] Identify and isolate "The Studio" assets.
 
 ## 🚚 Extraction Progress
 - [ ] Migrate `Project Genesis` and `EverMemOS` to Vault.

@@ -171,23 +171,3 @@
 {"timestamp": 1782506125.920708, "event": null, "payload": {"title": "play"}, "results": []}
 {"timestamp": 1782512091.3675702, "event": "system.reason", "payload": {"intent": null, "stage": "execute", "meta": {}}, "results": []}
 {"timestamp": 1782512091.3715355, "event": null, "payload": {"title": "play"}, "results": []}
-{"timestamp": 1783713683.5727987, "event": "system.reason", "payload": {"intent": null, "stage": "autonomous_execute", "meta": {}}, "results": []}
-{"timestamp": 1783713683.5728934, "event": "system.reason", "payload": {"intent": null, "stage": "execute", "meta": {}}, "results": []}
-{"timestamp": 1783714163.3167963, "event": "system.reason", "payload": {"intent": null, "stage": "autonomous_execute", "meta": {}}, "results": []}
-{"timestamp": 1783714163.3168926, "event": "system.reason", "payload": {"intent": null, "stage": "execute", "meta": {}}, "results": []}
-{"timestamp": 1783984980.654098, "event": "vision.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783984980.6542459, "event": "audio.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783985169.1016617, "event": "vision.activate", "payload": {"source": "webcam"}, "results": []}
-{"timestamp": 1783987361.1951823, "event": "vision.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987361.1952214, "event": "audio.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987385.994282, "event": "vision.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987385.9943228, "event": "audio.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987498.7401369, "event": "vision.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987498.7401786, "event": "audio.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987790.6562376, "event": "vision.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987790.6562836, "event": "audio.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987946.044063, "event": "vision.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1783987946.0441031, "event": "audio.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1784041847.143974, "event": "vision.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1784041847.1440425, "event": "audio.activate", "payload": {"source": "iphone"}, "results": []}
-{"timestamp": 1784041862.0469682, "event": "user.presence", "payload": {"status": "active", "source": "iphone"}, "results": []}

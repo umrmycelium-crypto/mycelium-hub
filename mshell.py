@@ -1,13 +1,3 @@
-import random
-import time
-import sys
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Prompt
-from rich.markdown import Markdown
-from rich.text import Text
-from rich.align import Align
-
 from mycelium.core.bootstrap_kernel import bootstrap
 from mycelium.core.router import route
 from mycelium.core.compiler import IntentCompiler

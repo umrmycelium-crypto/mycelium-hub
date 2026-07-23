@@ -62,6 +62,18 @@ class IntentCompiler:
             }
 
         # -------------------------
+        # EXPLAIN COMMANDS
+        # -------------------------
+        if input_str.startswith("explain "):
+            return {
+                "name": "system.auto.explain",
+                "payload": {
+                    "raw": input_str.replace("explain ", "", 1).strip()
+                },
+                "context": {"source": "mshell"}
+            }
+
+        # -------------------------
         # REPAIR COMMANDS
         # -------------------------
         if input_str.startswith("repair "):

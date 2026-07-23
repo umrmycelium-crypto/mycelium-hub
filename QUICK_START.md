@@ -2,6 +2,19 @@
 
 ## Immediate Actions
 
+### Environment Setup (Recommended for LLM Features)
+
+If you want to use AI-powered features like intent synthesis and auto-explanations:
+
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env and set your LLM model (if different from default)
+# Default: MYCELIUM_OLLAMA_MODEL=qwen2.5-coder:latest
+# Other options: llama2, mistral, neural-chat, etc.
+```
+
 ### If your dashboard is blank/not showing nodes:
 
 ```bash
@@ -105,7 +118,62 @@ python3 -c "import uvicorn; uvicorn.run('mycelium-hub.daemon.server:app', host='
 
 ---
 
-## Venice's Authority
+## Deployment & Configuration
+
+### Environment Variables
+
+Mycelium Hub uses environment variables for runtime configuration, especially for deployments:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `MYCELIUM_OLLAMA_MODEL` | `qwen2.5-coder:latest` | LLM model for intent synthesis and explanations |
+
+### Using Environment Variables
+
+**Development (Local):**
+```bash
+# Set environment variable before running
+export MYCELIUM_OLLAMA_MODEL=qwen2.5-coder:latest
+python app.py
+
+# Or use .env file
+cp .env.example .env
+# Edit .env with your settings
+# Then source it when starting services
+```
+
+**Docker (if applicable):**
+```yaml
+services:
+  mycelium:
+    environment:
+      - MYCELIUM_OLLAMA_MODEL=qwen2.5-coder:latest
+```
+
+**Systemd Service:**
+```ini
+[Service]
+Environment="MYCELIUM_OLLAMA_MODEL=qwen2.5-coder:latest"
+ExecStart=/path/to/mycelium/bin/python app.py
+```
+
+**Available LLM Models** (via Ollama):
+- `qwen2.5-coder:latest` (Recommended) - 4.7GB, best for code and explanations
+- `llama2` - 3.8GB, general purpose
+- `mistral` - 4.0GB, fast and efficient
+- `neural-chat` - 4.1GB, conversational
+
+To install a model:
+```bash
+ollama pull <model-name>
+```
+
+To list available models:
+```bash
+ollama list
+```
+
+---
 
 As **Venice (AI Communications Director)**, I'm authorized to:
 - ✅ Manage all campaign communications

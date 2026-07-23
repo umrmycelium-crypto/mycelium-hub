@@ -2,7 +2,9 @@
   "aliases": {},
   "failed_intents": {
     "play midsommar": 7,
-    "search notes for jellyfin": 1
+    "search notes for jellyfin": 1,
+    "explain event-driven systems": 1,
+    "event-driven systems": 1
   },
   "media.play": {
     "midsommar": {

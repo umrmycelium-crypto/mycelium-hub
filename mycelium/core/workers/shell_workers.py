@@ -75,6 +75,28 @@ def output_worker(event):
         print(f"\n❌ {msg}")
         print("mshell> ", end="", flush=True)
 
+def persist_unhandled(event):
+    """
+    Persist unhandled intents to persistent intent memory.
+    Trigger: INTENT_RESULT with result.status == 'NO_HANDLER'
+    """
+    if event.get("type") != INTENT_RESULT:
+        return
+
+    payload = event.get("payload", {})
+    intent = payload.get("intent", {})
+    result = payload.get("result", {})
+
+    try:
+        if isinstance(result, dict) and result.get("status") == "NO_HANDLER":
+            # Prefer the original raw text if available
+            raw = intent.get("payload", {}).get("raw") or intent.get("payload", {}).get("title") or str(intent)
+            from mycelium.memory.manager import record_failure
+            record_failure(result.get("intent"), raw)
+    except Exception:
+        pass
+
+
 def bootstrap_shell_workers():
     """
     Sits everyone down at the table.
@@ -82,3 +104,4 @@ def bootstrap_shell_workers():
     EVENT_BUS.subscribe(compiler_worker)
     EVENT_BUS.subscribe(router_worker)
     EVENT_BUS.subscribe(output_worker)
+    EVENT_BUS.subscribe(persist_unhandled)

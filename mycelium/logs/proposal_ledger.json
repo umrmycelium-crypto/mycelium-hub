@@ -1,0 +1,18 @@
+{
+  "status": "approved",
+  "timestamp": 1783381434,
+  "proposal": {
+    "name": "auto.explain",
+    "reason": "frequent unknown intent pattern",
+    "confidence": 0.3,
+    "risk": "medium",
+    "intent_schema": {
+      "name": "explain event-driven systems",
+      "payload": {},
+      "context": {}
+    }
+  },
+  "id": 1,
+  "approved_at": 1783381483,
+  "approved_by": "user"
+}

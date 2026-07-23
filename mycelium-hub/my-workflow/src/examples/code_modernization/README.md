@@ -6,14 +6,14 @@ Modernizing a legacy codebase (e.g. Python 2.7 to 3.12) as a single LLM call fai
 
 ## Workflows primitives demonstrated
 
-| Primitive | How it's used |
-|---|---|
-| Sub-workflows (parent -> N children) | `workflow.py` spawns one `ModernizeFileWorkflow` per file |
-| Parallel sub-workflow execution | `asyncio.gather(*child_tasks)` dispatches all children simultaneously |
-| Structured-output LLM | `chat_parse_to_model(ModernizedFile, ...)` validates the LLM response as Pydantic |
-| Sandboxed activity | `validate_python_syntax` shells out to a fresh subprocess with an explicit timeout |
-| `wait_for_input()` HITL | Parent suspends at zero compute cost; resumes when reviewer clicks Accept/Decline |
-| Activity retry policy | `retry_policy_max_attempts=3` on `modernize_file_llm` -- bad syntax retries automatically |
+| Primitive                            | How it's used                                                                             |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- |
+| Sub-workflows (parent -> N children) | `workflow.py` spawns one `ModernizeFileWorkflow` per file                                 |
+| Parallel sub-workflow execution      | `asyncio.gather(*child_tasks)` dispatches all children simultaneously                     |
+| Structured-output LLM                | `chat_parse_to_model(ModernizedFile, ...)` validates the LLM response as Pydantic         |
+| Sandboxed activity                   | `validate_python_syntax` shells out to a fresh subprocess with an explicit timeout        |
+| `wait_for_input()` HITL              | Parent suspends at zero compute cost; resumes when reviewer clicks Accept/Decline         |
+| Activity retry policy                | `retry_policy_max_attempts=3` on `modernize_file_llm` -- bad syntax retries automatically |
 
 ## Architecture
 
