@@ -7,7 +7,7 @@ LLM_MODELS = {
     "llama3.1": "llama3.1",
     "llama3.1:latest": "llama3.1:latest",
     "qwen2.5-coder:latest": "qwen2.5-coder:latest",
-    "mycelium-brain:latest": "mycelium-brain:latest",
+    "mycelium-brain": "mycelium-brain:latest",
     "devstral": "devstral",
 }
 
